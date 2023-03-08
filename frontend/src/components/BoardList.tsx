@@ -1,8 +1,15 @@
 import React from "react";
+import { Navigate, useNavigate } from 'react-router-dom';
 
-const Boards: React.FC = ()=>{
+
+const BoardList: React.FC = ()=>{
+    const navigate = useNavigate();
+    const link = ()=>{
+        window.location.replace('/board?id=1');
+
+    }
     return (
-<div className="mx-40 my-32">
+        <div className="mx-40 my-32">
     <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
         <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
             <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -29,26 +36,26 @@ const Boards: React.FC = ()=>{
             </thead>
             <tbody>
                 
-                <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" >
-                    <td className="px-6 py-4">
-                        1
-                    </td>
-                    <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                        한강공원 일요일 10시에 같이 가실 분 구해용
-                    </th>
-                    <td className="px-6 py-4">
-                        회원1
-                    </td>
-                    <td className="px-6 py-4">
-                        createdAt
-                    </td>
-                    <td className="px-6 py-4">
-                        3 / 8
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                        <button type="button" className="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">참가하기</button>
-                    </td>
-                </tr>
+                    <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" onClick={link}>
+                        <td className="px-6 py-4">
+                            1
+                        </td>
+                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                            한강공원 일요일 10시에 같이 가실 분 구해용
+                        </th>
+                        <td className="px-6 py-4">
+                            회원1
+                        </td>
+                        <td className="px-6 py-4">
+                            createdAt
+                        </td>
+                        <td className="px-6 py-4">
+                            3 / 8
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                            <button type="button" className="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">참가하기</button>
+                        </td>
+                    </tr>
                 
             </tbody>
         </table>
@@ -94,4 +101,4 @@ const Boards: React.FC = ()=>{
     )
 }
 
-export default Boards;
+export default BoardList;
