@@ -26,7 +26,7 @@ root.render(
     <React.StrictMode>
         <BrowserRouter>
             <RecoilRoot>
-                <GlobalStyles />
+                {/* <GlobalStyles /> */}
                 <App />
             </RecoilRoot>
         </BrowserRouter>

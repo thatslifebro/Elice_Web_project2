@@ -7,10 +7,6 @@ function Home() {
             <span className='absolute top-[200px] left-16 text-6xl'>
                 한강 드라이브 갈까요?
             </span>
-            {/* <div
-                className='w-full h-screen bg-no-repeat bg-cover opacity-30'
-                style={{ backgroundImage: 'url(river.jpg)' }}
-            ></div> */}
         </>
     );
 }
