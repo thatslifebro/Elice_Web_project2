@@ -1,16 +1,23 @@
 import React from "react";
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
+import queryString from 'query-string'
 
 
 const BoardList: React.FC = ()=>{
     const navigate = useNavigate();
     const link = ()=>{
         window.location.replace('/board?id=1');
-
     }
+
+    const qs = queryString.parse(window.location.search);
+
     return (
         <div className="mx-40 my-32">
+        <div className="text-right">
+            <Link to="/board/create"><button type="button" className="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">글 작성하기</button></Link>
+        </div>
     <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+        
         <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
             <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
