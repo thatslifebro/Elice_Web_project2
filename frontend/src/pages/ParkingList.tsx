@@ -5,7 +5,7 @@ function ParkingList() {
         <>
             <div className='flex flex-col p-5' style={{height: '70rem'}}>
                 <div className='flex p-5 h-1/2 justify-center'>
-                    <div className='flex flex-col p-8 mr-10 w-1/4 h-full overflow-auto bg-gray-200 rounded-md'>
+                    <div className='flex flex-col p-8 mr-10 w-1/4 h-full overflow-auto bg-gray-100 rounded-md'>
                         <div className='flex mb-3 place-content-between w-full h-1/5'> 
                             <div className='text-lg font-bold'>여의도한강공원 1주차장
                                 <div className='text-xs font-light'>서울특별시 영등포구 여의도동 314-3<br/>3km</div>
@@ -19,7 +19,7 @@ function ParkingList() {
                             <div className='w-4 h-4 mt-5 bg-red-500 rounded-full'></div>
                         </div>
                     </div>
-                    <div className='flex felx-col p-8 w-3/5 h-full border-solid border border-gray-300 rounded-md'>
+                    <div className='flex felx-col p-8 w-3/5 h-full border-solid border border-gray-200 rounded-md'>
                         주차장
                     </div>
                 </div>

@@ -10,6 +10,7 @@ import MyPage from './pages/MyPage';
 import Board from './pages/Board';
 import Msg from './pages/Msg';
 import ParkingList from './pages/ParkingList';
+import ParkingDetail from './pages/ParkingDetail';
 import BoardCreate from './pages/BoardCreate';
 import BoardUpdate from './pages/BoardUpdate';
 
@@ -27,6 +28,7 @@ function App() {
                 <Route path='/board/update' element={<BoardUpdate />}/>
                 <Route path='/msg' element={<Msg />} />
                 <Route path='/parking' element={<ParkingList />} />
+                <Route path='/parking/detail' element={<ParkingDetail />} />
             </Routes>
             <Footer />
         </>
