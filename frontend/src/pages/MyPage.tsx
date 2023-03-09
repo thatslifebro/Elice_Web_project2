@@ -1,31 +1,36 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useRef } from 'react';
+import { useForm, SubmitHandler } from 'react-hook-form';
+
+interface FormValue {
+    nickname: string;
+    password: string;
+    confirmPassword: string;
+}
 
 function MyPage() {
+    const {
+        register,
+        handleSubmit,
+        watch,
+        formState: { errors },
+    } = useForm<FormValue>();
+
+    // 비밀번호와 비밀번호 확인이 일치하는지 검증하기 위해 "password" input 의 value 를 추적함
+    const passwordRef = useRef<string | null>(null);
+    passwordRef.current = watch('password');
+
+    const onSubmitHandler: SubmitHandler<FormValue> = (data) => {
+        console.log(data);
+    };
+
     return (
         <>
             <div className='px-14 py-10 w-4/12 mx-auto mt-[10rem] mb-16 border-solid border border-gray-800/10 rounded-3xl shadow-2xl'>
                 <div className='bg-gray-600 h-[120px] -mt-10 mb-5 -mx-14 rounded-t-3xl flex justify-center items-center flex-col'>
-                    <p className='text-white text-center text-lg'>오손도손</p>
-                    <p className='text-white text-center'>oson@doson.com</p>
+                    <p className='text-white text-center text-lg'>닉네임</p>
+                    <p className='text-white text-center'>이메일</p>
                 </div>
-                <form>
-                    {/* <div className='mb-6'>
-                        <label
-                            htmlFor='email'
-                            className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'
-                        >
-                            email
-                        </label>
-                        <input
-                            type='email'
-                            id='email'
-                            className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
-                            value={'oson@doson.com'}
-                            required
-                            disabled
-                        />
-                    </div> */}
+                <form onSubmit={handleSubmit(onSubmitHandler)}>
                     <div className='mb-6'>
                         <label
                             htmlFor='nickname'
@@ -34,12 +39,23 @@ function MyPage() {
                             nickname
                         </label>
                         <input
+                            {...register('nickname', {
+                                required: true,
+                                maxLength: 15,
+                            })}
                             type='text'
                             id='nickname'
                             className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
-                            defaultValue={'오손도손'}
-                            required
+                            defaultValue={'닉네임'}
                         />
+                        <p className='mt-2 text-sm text-red-600 dark:text-red-500'>
+                            <span className='font-bold'>
+                                {errors.nickname?.type === 'required' &&
+                                    '닉네임을 입력해주세요!'}
+                                {errors.nickname?.type === 'maxLength' &&
+                                    '최대 15자까지 입력할 수 있습니다!'}
+                            </span>
+                        </p>
                     </div>
                     <div className='mb-6'>
                         <label
@@ -49,25 +65,49 @@ function MyPage() {
                             password
                         </label>
                         <input
+                            {...register('password', {
+                                required: true,
+                                minLength: 8,
+                                maxLength: 20,
+                            })}
                             type='password'
                             id='password'
                             className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
-                            required
+                            defaultValue={'12345678'}
                         />
+                        <p className='mt-2 text-sm text-red-600 dark:text-red-500'>
+                            <span className='font-bold'>
+                                {errors.password?.type === 'required' &&
+                                    '비밀번호를 입력해주세요!'}
+                                {errors.password?.type === 'minLength' &&
+                                    '최소 8자부터 입력할 수 있습니다!'}
+                                {errors.password?.type === 'maxLength' &&
+                                    '최대 20자까지 입력할 수 있습니다!'}
+                            </span>
+                        </p>
                     </div>
                     <div className='mb-6'>
                         <label
-                            htmlFor='confirm-password'
+                            htmlFor='confirmPassword'
                             className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'
                         >
                             confirm password
                         </label>
                         <input
+                            {...register('confirmPassword', {
+                                validate: (value) =>
+                                    value === passwordRef.current,
+                            })}
                             type='password'
-                            id='confirm-password'
+                            id='confirmPassword'
                             className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
-                            required
                         />
+                        <p className='mt-2 text-sm text-red-600 dark:text-red-500'>
+                            <span className='font-bold'>
+                                {errors.confirmPassword?.type === 'validate' &&
+                                    '비밀번호가 일치하지 않습니다.'}
+                            </span>
+                        </p>
                     </div>
                     <div className='mb-6'>
                         <label
@@ -85,7 +125,8 @@ function MyPage() {
                                     name='countries'
                                     value='USA'
                                     className='self-center w-4 h-4 border-gray-300 focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-600 dark:focus:bg-blue-600 dark:bg-gray-700 dark:border-gray-600'
-                                    checked
+                                    defaultChecked
+                                    disabled
                                 />
                                 <label
                                     htmlFor='country-option-1'
@@ -100,6 +141,7 @@ function MyPage() {
                                 name='countries'
                                 value='Germany'
                                 className='w-4 h-4 border-gray-300 focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-600 dark:focus:bg-blue-600 dark:bg-gray-700 dark:border-gray-600'
+                                disabled
                             />
                             <label
                                 htmlFor='country-option-2'
@@ -120,7 +162,9 @@ function MyPage() {
                             type='date'
                             id='birthdate'
                             className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
+                            defaultValue={'2023-03-09'}
                             required
+                            disabled
                         />
                     </div>
                     <div className='flex flex-col justify-between'>

@@ -1,7 +1,23 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useForm, SubmitHandler } from 'react-hook-form';
+
+interface FormValue {
+    email: string;
+    password: string;
+}
 
 function SignIn() {
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm<FormValue>();
+
+    const onSubmitHandler: SubmitHandler<FormValue> = (data) => {
+        console.log(data);
+    };
+
     return (
         <>
             <div className='px-14 py-10 w-4/12 mx-auto mt-[10rem] mb-16 border-solid border border-gray-800/10 rounded-3xl shadow-2xl'>
@@ -10,35 +26,51 @@ function SignIn() {
                     className='w-16 h-16 mx-auto mb-8'
                     alt='Flowbite Logo'
                 />
-                <form>
+                <form onSubmit={handleSubmit(onSubmitHandler)}>
                     <div className='mb-6'>
                         <label
                             htmlFor='email'
                             className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'
                         >
-                            Your email
+                            email
                         </label>
                         <input
-                            type='email'
+                            {...register('email', {
+                                required: true,
+                            })}
+                            type='text'
                             id='email'
                             className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
                             placeholder='name@osondoson.com'
-                            required
                         />
+                        <p className='mt-2 text-sm text-red-600 dark:text-red-500'>
+                            <span className='font-bold'>
+                                {errors.email?.type === 'required' &&
+                                    '이메일을 입력해주세요!'}
+                            </span>
+                        </p>
                     </div>
                     <div className='mb-6'>
                         <label
                             htmlFor='password'
                             className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'
                         >
-                            Your password
+                            password
                         </label>
                         <input
+                            {...register('password', {
+                                required: true,
+                            })}
                             type='password'
                             id='password'
                             className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
-                            required
                         />
+                        <p className='mt-2 text-sm text-red-600 dark:text-red-500'>
+                            <span className='font-bold'>
+                                {errors.password?.type === 'required' &&
+                                    '비밀번호를 입력해주세요!'}
+                            </span>
+                        </p>
                     </div>
                     {/* <div className='flex items-start mb-6'>
                         <div className='flex items-center h-5'>
