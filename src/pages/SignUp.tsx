@@ -1,5 +1,7 @@
 import React, { useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import { customAxios } from '../utils/customAxios';
 
 interface FormValue {
     email: string;
@@ -7,7 +9,8 @@ interface FormValue {
     confirmPassword: string;
     nickname: string;
     gender: string;
-    birthDate: string;
+    birthDateOrg: string;
+    birthDate: { year: number; month: number; day: number };
 }
 
 function SignUp() {
@@ -18,12 +21,31 @@ function SignUp() {
         formState: { errors },
     } = useForm<FormValue>();
 
+    const navigate = useNavigate();
+
     // 비밀번호와 비밀번호 확인이 일치하는지 검증하기 위해 "password" input 의 value 를 추적함
     const passwordRef = useRef<string | null>(null);
     passwordRef.current = watch('password');
 
     const onSubmitHandler: SubmitHandler<FormValue> = (data) => {
-        console.log(data);
+        const [year, month, day]: number[] = data.birthDateOrg
+            .split('-')
+            .map((e) => Number(e));
+
+        data.birthDate = { year: year, month: month, day: day };
+
+        customAxios
+            .post('/api/users/register', data)
+            .then((response) => response.data)
+            .then((data) => {
+                if (data.data === 'OK') {
+                    alert('정상적으로 가입되었습니다.');
+                    navigate('/sign-in');
+                }
+            })
+            .catch((error) => {
+                alert(error.response.data.errorMessage);
+            });
     };
 
     return (
@@ -189,23 +211,23 @@ function SignUp() {
                     </div>
                     <div className='mb-6'>
                         <label
-                            htmlFor='birthdate'
+                            htmlFor='birthDateOrg'
                             className='block mb-2 text-sm font-medium text-gray-900 dark:text-white'
                         >
-                            birthdate
+                            birthDate
                         </label>
                         <input
-                            {...register('birthDate', {
+                            {...register('birthDateOrg', {
                                 required: true,
                             })}
                             type='date'
-                            id='birthdate'
+                            id='birthDateOrg'
                             className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
                         />
 
                         <p className='mt-2 text-sm text-red-600 dark:text-red-500'>
                             <span className='font-bold'>
-                                {errors.birthDate?.type === 'required' &&
+                                {errors.birthDateOrg?.type === 'required' &&
                                     '생년월일을 입력해주세요!'}
                             </span>
                         </p>
