@@ -13,7 +13,13 @@ function MyPage() {
         handleSubmit,
         watch,
         formState: { errors },
-    } = useForm<FormValue>();
+    } = useForm<FormValue>({
+        defaultValues: {
+            nickname: 'nickname',
+            password: '1234',
+            confirmPassword: '',
+        },
+    });
 
     // 비밀번호와 비밀번호 확인이 일치하는지 검증하기 위해 "password" input 의 value 를 추적함
     const passwordRef = useRef<string | null>(null);
@@ -46,7 +52,6 @@ function MyPage() {
                             type='text'
                             id='nickname'
                             className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
-                            defaultValue={'닉네임'}
                         />
                         <p className='mt-2 text-sm text-red-600 dark:text-red-500'>
                             <span className='font-bold'>
@@ -73,7 +78,6 @@ function MyPage() {
                             type='password'
                             id='password'
                             className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
-                            defaultValue={'12345678'}
                         />
                         <p className='mt-2 text-sm text-red-600 dark:text-red-500'>
                             <span className='font-bold'>

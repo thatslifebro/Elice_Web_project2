@@ -1,6 +1,8 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import { api } from '../utils/customAxios';
+import setAuthorizationToken from '../utils/setAuthorizationToken';
 
 interface FormValue {
     email: string;
@@ -14,8 +16,22 @@ function SignIn() {
         formState: { errors },
     } = useForm<FormValue>();
 
+    const navigate = useNavigate();
+
     const onSubmitHandler: SubmitHandler<FormValue> = (data) => {
-        console.log(data);
+        api.post('/api/users/login', data)
+            .then((response) => response.data)
+            .then((data) => {
+                const { accessToken, refreshToken } = data.data;
+                if (data.data) {
+                    setAuthorizationToken(accessToken, refreshToken);
+                    navigate('/');
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+                alert(error.response.data.errorMessage);
+            });
     };
 
     return (
