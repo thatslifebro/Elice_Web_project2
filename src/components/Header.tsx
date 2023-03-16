@@ -11,13 +11,11 @@ function Header() {
     function logout() {
         api.post('/api/users/logout')
             .then((response) => {
-                if (response.status === 200) {
-                    localStorage.removeItem('expireAt');
-                    localStorage.removeItem('accessToken');
-                    Cookie.remove('refreshToken');
-                    delete axios.defaults.headers.common['Authorization'];
-                    navigate('/');
-                }
+                localStorage.removeItem('expireAt');
+                localStorage.removeItem('accessToken');
+                Cookie.remove('refreshToken');
+                delete axios.defaults.headers.common['Authorization'];
+                navigate('/');
             })
             .catch((error) => {
                 console.error(error);
