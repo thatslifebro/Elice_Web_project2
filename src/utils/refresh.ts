@@ -11,14 +11,11 @@ const refresh = async (
 
     // 토큰이 만료되었고, refreshToken 이 저장되어 있을 때
     if (moment(expireAt).diff(moment()) < 0 && refreshToken) {
-        const body = {
-            refreshToken,
-        };
+        axios.defaults.headers.common['Authorization'] = refreshToken;
 
         // 토큰 갱신 서버통신
         const { data } = await axios.post(
-            `${process.env.SERVER_URL}/api/users/token`,
-            body
+            `${process.env.REACT_APP_SERVER_URL}/api/users/refresh`
         );
 
         token = data.data.accessToken;
@@ -29,7 +26,7 @@ const refresh = async (
         );
     }
 
-    if (config.headers) config.headers['Authorization'] = `Bearer ${token}`;
+    if (config.headers) config.headers['Authorization'] = `${token}`;
 
     return config;
 };
