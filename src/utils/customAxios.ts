@@ -7,10 +7,14 @@ const customAxios: AxiosInstance = axios.create({
 
 const api: AxiosInstance = axios.create({
     baseURL: process.env.REACT_APP_SERVER_URL, // 기본 서버 주소 입력
-    timeout: 10000,
+    timeout: 3000,
     params: {},
 });
 
 api.interceptors.request.use(refresh, refreshErrorHandle);
+// api.interceptors.response.use(
+//     (res) => res.data,
+//     (error) => {}
+// );
 
 export { customAxios, api };

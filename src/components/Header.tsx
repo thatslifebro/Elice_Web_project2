@@ -11,6 +11,7 @@ function Header() {
     function logout() {
         api.post('/api/users/logout')
             .then((response) => {
+                localStorage.removeItem('user');
                 localStorage.removeItem('expireAt');
                 localStorage.removeItem('accessToken');
                 Cookie.remove('refreshToken');
