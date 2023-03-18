@@ -1,13 +1,12 @@
 import { create } from "domain"
 import React from "react"
-import { createTaggedTemplate } from "typescript"
 import { Post } from "./BoardList"
 
 
 const BoardListRow = ({_id,title,content,participantInfo,authorId,createdAt}:Post):JSX.Element=>{
     
     const link = ()=>{
-        window.location.replace('/board?id=1');
+        window.location.replace(`/board?id=${_id}`);
     }
     return(
         <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" onClick={link}>

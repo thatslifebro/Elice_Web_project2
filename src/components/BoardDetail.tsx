@@ -1,26 +1,62 @@
 import React, { useEffect } from "react";
 import queryString from 'query-string';
 import { Link } from "react-router-dom";
-import { atom } from "recoil";
+import { atom, useRecoilState } from "recoil";
+import { api } from "../utils/customAxios";
+import { Post } from "./BoardList";
 
+const postState = atom<Post>({
+    key:"post",
+    default:{
+            _id: 1,
+            title: "등록된 게시물이 없다",
+            content: "등록된 게시물이 없다",
+            participantInfo:{
+                totalCount:10,
+                currentCount:2,
+                userIdList: ["user1","user2"]
+            },
+            authorId:"1111",
+            createdAt: new Date(),
+            isDeleted: false,
+            __v: 0
+        },
+    
+});
 
 const BoardDetail: React.FC = ()=>{
     const qs = queryString.parse(window.location.search);
-    console.log(qs.id)
 
-    // const getPost =
+    const [post, setPost]= useRecoilState(postState);
+
+    const getPost=()=>{
+        console.log(qs.id)
+        api
+            .get(`/api/boards/${qs.id}`)
+            .then((response) => response)
+            .then((data) => {
+                    console.log(data);
+                    // setPost(data);
+                }
+            )
+            .catch((error) => {
+                alert(error.response.data.errorMessage);
+            });
+    }
+
 
     useEffect(()=>{
-
+        getPost()
+        
     },[])
 
     return (
 <div className="mx-40 my-32">
     <div className="grid grid-cols-4 gap-4">
         <div className="col-span-3">
-            <p className="text-2xl">한강공원 일요일 10시에 같이 가실 분 구해용</p>
-            <span className="text-sm mr-5">회원1</span>
-            <span className="text-sm">2023.03.08 17:54</span>
+            <p className="text-2xl">{post.title}</p>
+            <span className="text-sm mr-5">{post.authorId}</span>
+            <span className="text-sm">{String(post.createdAt)}</span>
         </div>
         <div>
             <button type="button" className="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">참가하기</button>
@@ -29,23 +65,28 @@ const BoardDetail: React.FC = ()=>{
     <hr />
     <div className="grid grid-cols-4 gap-4 mt-5">
         <div className="col-span-3">
-            <p className="text-xl m-10"> Lorem, ipsum dolor sit amet consectetur adipisicing elit. Consequatur obcaecati reprehenderit illum deleniti alias est ex, magnam, inventore dolores excepturi voluptas? Harum nemo labore quas vitae saepe, vel quam omnis!</p>
+            <p className="text-xl m-10"> {post.content}</p>
         </div>
         <div>
             <table>
                 <thead className="text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                     <tr>
                         <th scope="col" className="px-6 py-3">
-                            참가자 명단
+                            참가자 ( {post.participantInfo.currentCount} / {post.participantInfo.totalCount})
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                    {post.participantInfo.userIdList.map((id)=>{
+                        return(
+                            <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                         <td className="px-6 py-4">
-                            회원1
+                            {id}
                         </td>
                     </tr>
+                        )
+                    })}
+                    
                 </tbody>
             </table>
         </div>

@@ -1,6 +1,6 @@
 import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { customAxios } from "../utils/customAxios";
+import { api, customAxios } from "../utils/customAxios";
 
 const BoardCreate: React.FC = ()=>{
     type PostForm={
@@ -16,16 +16,17 @@ const BoardCreate: React.FC = ()=>{
         formState: { errors },
     } = useForm<PostForm>();
 
-    const onSubmit: SubmitHandler<PostForm> = data => {
-        customAxios
-            .post(`/api/boards`,data)
-            .then((response) => response.data)
-            .then(()=>{
-                // navigate
-            })
-            .catch((error) => {
-                alert(error.response.data.errorMessage);
-            });
+    const onSubmit: SubmitHandler<PostForm> = (data) => {
+        console.log(data);
+        api
+        .post(`/api/boards`,data)
+        .then((response) => response.data.data)
+        .then((data)=>{
+            window.location.replace("/board");
+        })
+        .catch((error) => {
+            alert(error.response.data.errorMessage);
+        });
     };
     return (
         
@@ -45,7 +46,7 @@ const BoardCreate: React.FC = ()=>{
                     </div>
                     <div className="mt-3">
                         <label  className="block mb-2 text-xl font-medium text-gray-900 dark:text-white">전체 인원</label>
-                        <input className="block p-2.5 m-auto w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="content" {...register("totalCount",{required:true, pattern: /[\d]{1,2}/})}></input>
+                        <input className="block p-2.5 m-auto w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="max 8" type="number" {...register("totalCount",{required:true, valueAsNumber: true})}></input>
                         {errors.totalCount && <span>number is required</span>}
                     </div>
                     <div className="text-right mt-5"><button type="submit" className="rounded-full text-lg bg-slate-300 p-3 ml-3">등록하기</button></div>
