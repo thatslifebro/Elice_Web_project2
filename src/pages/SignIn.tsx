@@ -1,6 +1,9 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import { api } from '../utils/customAxios';
+import setAuthorizationToken from '../utils/setAuthorizationToken';
+import { AxiosError } from 'axios';
 
 interface FormValue {
     email: string;
@@ -14,8 +17,25 @@ function SignIn() {
         formState: { errors },
     } = useForm<FormValue>();
 
-    const onSubmitHandler: SubmitHandler<FormValue> = (data) => {
-        console.log(data);
+    const navigate = useNavigate();
+
+    const onSubmitHandler: SubmitHandler<FormValue> = async (data) => {
+        try {
+            const token = await api.post('/api/users/login', data);
+            if (token.status === 200) {
+                const { accessToken, refreshToken } = token.data.data;
+
+                setAuthorizationToken(accessToken, refreshToken);
+                navigate('/');
+
+                const user = await api.post('/api/users/user');
+                localStorage.setItem('user', JSON.stringify(user.data.data));
+            }
+        } catch (error) {
+            console.error(error);
+            if (error instanceof AxiosError)
+                alert(error.response?.data.errorMessage);
+        }
     };
 
     return (

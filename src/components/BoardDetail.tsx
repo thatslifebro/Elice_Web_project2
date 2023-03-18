@@ -1,10 +1,19 @@
-import React from "react";
+import React, { useEffect } from "react";
 import queryString from 'query-string';
 import { Link } from "react-router-dom";
+import { atom } from "recoil";
+
 
 const BoardDetail: React.FC = ()=>{
     const qs = queryString.parse(window.location.search);
     console.log(qs.id)
+
+    // const getPost =
+
+    useEffect(()=>{
+
+    },[])
+
     return (
 <div className="mx-40 my-32">
     <div className="grid grid-cols-4 gap-4">

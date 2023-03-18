@@ -1,9 +1,20 @@
 import axios, { AxiosInstance } from 'axios';
-// import cookies from 'js-cookie';
+import { refresh, refreshErrorHandle } from './refresh';
 
-export const customAxios: AxiosInstance = axios.create({
-    baseURL: 'http://localhost:3500', // 기본 서버 주소 입력
-    // headers: {
-    //     access_token: cookies.get('access_token'),
-    // },
+const customAxios: AxiosInstance = axios.create({
+    baseURL: process.env.REACT_APP_SERVER_URL, // 기본 서버 주소 입력
 });
+
+const api: AxiosInstance = axios.create({
+    baseURL: process.env.REACT_APP_SERVER_URL, // 기본 서버 주소 입력
+    timeout: 3000,
+    params: {},
+});
+
+api.interceptors.request.use(refresh, refreshErrorHandle);
+// api.interceptors.response.use(
+//     (res) => res.data,
+//     (error) => {}
+// );
+
+export { customAxios, api };

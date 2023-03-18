@@ -5,15 +5,31 @@ interface FormValue {
     nickname: string;
     password: string;
     confirmPassword: string;
+    gender: string;
+    birthDate: string;
 }
 
 function MyPage() {
+    const user = JSON.parse(localStorage.getItem('user') || 'Anonymous');
+    const { year, month, day } = user.birthDate;
+    const birthDate = `${year}-${String(month).padStart(2, '0')}-${String(
+        day
+    ).padStart(2, '0')}`;
+
     const {
         register,
         handleSubmit,
         watch,
         formState: { errors },
-    } = useForm<FormValue>();
+    } = useForm<FormValue>({
+        defaultValues: {
+            nickname: user.nickname,
+            password: '',
+            confirmPassword: '',
+            gender: user.gender,
+            birthDate: birthDate,
+        },
+    });
 
     // 비밀번호와 비밀번호 확인이 일치하는지 검증하기 위해 "password" input 의 value 를 추적함
     const passwordRef = useRef<string | null>(null);
@@ -27,8 +43,10 @@ function MyPage() {
         <>
             <div className='px-14 py-10 w-4/12 mx-auto mt-[10rem] mb-16 border-solid border border-gray-800/10 rounded-3xl shadow-2xl'>
                 <div className='bg-gray-600 h-[120px] -mt-10 mb-5 -mx-14 rounded-t-3xl flex justify-center items-center flex-col'>
-                    <p className='text-white text-center text-lg'>닉네임</p>
-                    <p className='text-white text-center'>이메일</p>
+                    <p className='text-white text-center text-lg'>
+                        {user.nickname}
+                    </p>
+                    <p className='text-white text-center'>{user.email}</p>
                 </div>
                 <form onSubmit={handleSubmit(onSubmitHandler)}>
                     <div className='mb-6'>
@@ -46,7 +64,6 @@ function MyPage() {
                             type='text'
                             id='nickname'
                             className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
-                            defaultValue={'닉네임'}
                         />
                         <p className='mt-2 text-sm text-red-600 dark:text-red-500'>
                             <span className='font-bold'>
@@ -73,7 +90,6 @@ function MyPage() {
                             type='password'
                             id='password'
                             className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
-                            defaultValue={'12345678'}
                         />
                         <p className='mt-2 text-sm text-red-600 dark:text-red-500'>
                             <span className='font-bold'>
@@ -120,12 +136,12 @@ function MyPage() {
                         <div className='flex items-center mb-4'>
                             <div className='w-1/2 flex'>
                                 <input
+                                    {...register('gender', {})}
                                     id='country-option-1'
                                     type='radio'
-                                    name='countries'
-                                    value='USA'
+                                    name='gender'
+                                    value='male'
                                     className='self-center w-4 h-4 border-gray-300 focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-600 dark:focus:bg-blue-600 dark:bg-gray-700 dark:border-gray-600'
-                                    defaultChecked
                                     disabled
                                 />
                                 <label
@@ -136,10 +152,11 @@ function MyPage() {
                                 </label>
                             </div>
                             <input
+                                {...register('gender', {})}
                                 id='country-option-2'
                                 type='radio'
-                                name='countries'
-                                value='Germany'
+                                name='gender'
+                                value='female'
                                 className='w-4 h-4 border-gray-300 focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-600 dark:focus:bg-blue-600 dark:bg-gray-700 dark:border-gray-600'
                                 disabled
                             />
@@ -159,10 +176,10 @@ function MyPage() {
                             birthdate
                         </label>
                         <input
+                            {...register('birthDate', {})}
                             type='date'
                             id='birthdate'
                             className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'
-                            defaultValue={'2023-03-09'}
                             required
                             disabled
                         />

@@ -1,23 +1,10 @@
 import { create } from "domain"
 import React from "react"
 import { createTaggedTemplate } from "typescript"
+import { Post } from "./BoardList"
 
- interface Participants {
-    totalCount: number,
-    currentCount: number,
-    userIdList: string[]
-}
 
-interface Post {
-        id: number,
-        title: string,
-        content: string,
-        participantInfo : Participants,
-        authorId: string,
-        createdAt: Date
-    }
-
-const BoardListRow = ({id,title,content,participantInfo,authorId,createdAt}:Post):JSX.Element=>{
+const BoardListRow = ({_id,title,content,participantInfo,authorId,createdAt}:Post):JSX.Element=>{
     
     const link = ()=>{
         window.location.replace('/board?id=1');
@@ -25,7 +12,7 @@ const BoardListRow = ({id,title,content,participantInfo,authorId,createdAt}:Post
     return(
         <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" onClick={link}>
             <td className="px-6 py-4">
-                {id}
+                {_id}
             </td>
             <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                 {title}
