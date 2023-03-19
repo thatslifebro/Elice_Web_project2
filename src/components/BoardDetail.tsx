@@ -5,12 +5,12 @@ import { atom, useRecoilState } from "recoil";
 import { api } from "../utils/customAxios";
 import { Post } from "./BoardList";
 
-const postState = atom<Post>({
+export const postState = atom<Post>({
     key:"post",
     default:{
             _id: 1,
-            title: "등록된 게시물이 없다",
-            content: "등록된 게시물이 없다",
+            title: "null",
+            content: "null",
             participantInfo:{
                 totalCount:10,
                 currentCount:2,
@@ -25,18 +25,44 @@ const postState = atom<Post>({
 });
 
 const BoardDetail: React.FC = ()=>{
+
+    const clickBoardList =(e:React.MouseEvent<HTMLButtonElement>)=>{
+        e.preventDefault();
+        window.location.replace('/board');
+    }
+
+    const clickUpdate = (e:React.MouseEvent<HTMLButtonElement>)=>{
+        e.preventDefault();
+        window.location.replace(`/board/update?id=${qs.id}`);
+    }
+    const clickDelete = (e:React.MouseEvent<HTMLButtonElement>)=>{
+        e.preventDefault();
+        api
+        .delete(`/api/boards/${qs.id}`)
+        .then(response=>response.status)
+        .then((data)=>{
+            if(data===200){
+                window.location.replace('/board');
+            }
+            else{
+                alert("삭제할 수 없습니다.")
+            }
+        })
+        .catch((error)=>{
+            alert(error.response.data.errorMessage);
+        })
+    }
+
     const qs = queryString.parse(window.location.search);
 
     const [post, setPost]= useRecoilState(postState);
 
     const getPost=()=>{
-        console.log(qs.id)
         api
             .get(`/api/boards/${qs.id}`)
-            .then((response) => response)
+            .then((response) => response.data.data)
             .then((data) => {
-                    console.log(data);
-                    // setPost(data);
+                    setPost(data);
                 }
             )
             .catch((error) => {
@@ -79,7 +105,7 @@ const BoardDetail: React.FC = ()=>{
                 <tbody>
                     {post.participantInfo.userIdList.map((id)=>{
                         return(
-                            <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                            <tr key={id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                         <td className="px-6 py-4">
                             {id}
                         </td>
@@ -94,13 +120,13 @@ const BoardDetail: React.FC = ()=>{
     <div className="grid grid-cols-4 gap-4 mt-5">
         <ul className="inline-flex items-center ">
             <li>
-                <button type="button" className="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">목록</button>
+                <button type="button" className="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" onClick={clickBoardList}>목록</button>
             </li>
             <li>
-                <Link to="/board/update"><button type="button" className="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">수정</button></Link>
+                <Link to="/board/update"><button type="button" className="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" onClick={clickUpdate}>수정</button></Link>
             </li>
             <li>
-                <button type="button" className="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">삭제</button>
+                <button type="button" className="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" onClick={clickDelete}>삭제</button>
             </li>
         </ul>
     </div>

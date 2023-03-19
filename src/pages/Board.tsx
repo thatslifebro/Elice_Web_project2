@@ -8,7 +8,6 @@ const Board: React.FC = ()=>{
     () => queryString.parse(window.location.search)["id"] as string || null,
     []
   );
-  console.log({ boardId });
 
 
     return boardId?(<BoardDetail/>):(<BoardList />);

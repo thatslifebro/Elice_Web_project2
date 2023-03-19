@@ -1,4 +1,4 @@
-import { create } from "domain"
+
 import React from "react"
 import { Post } from "./BoardList"
 
