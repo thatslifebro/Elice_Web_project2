@@ -15,18 +15,16 @@ const BoardCreate: React.FC = ()=>{
         formState: { errors },
     } = useForm<PostForm>();
 
-    const onSubmit: SubmitHandler<PostForm> = (data) => {
-        const newData = {...data, totalCount: Number(data.totalCount)};
-        api
-        .post(`/api/boards`,newData)
-        .then((response) => response.data.data)
-        .then((data)=>{
+    const onSubmit: SubmitHandler<PostForm> = async (data) => {
+        try {
+            const newData = {...data, totalCount: Number(data.totalCount)};
+            await api.post(`/api/boards`,newData)
             window.location.replace("/board");
-        })
-        .catch((error) => {
+        } catch (error:any ) {
             alert(error.response.data.errorMessage);
-        });
-    };
+        };
+    }
+
     return (
         
         <div>
@@ -57,15 +55,3 @@ const BoardCreate: React.FC = ()=>{
 }
 
 export default BoardCreate;
-
-// {/* <form onSubmit={handleSubmit(onSubmit)}>
-//             {/* register your input into the hook by invoking the "register" function */}
-//             <input defaultValue="test" {...register("title",{required:true})} />
-//             {errors.title && <span>This field is required</span>}
-//             {/* include validation with required or other standard HTML validation rules */}
-//             <input {...register("content", { required: true })} />
-//             {/* errors will return when field validation fails  */}
-//             {errors.content && <span>This field is required</span>}
-//             aslkjdflksdjlk
-//             <input type="submit" />
-//             </form> */}

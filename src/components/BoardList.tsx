@@ -61,12 +61,10 @@ export const postListState = atom<Post[]>({
             __v: 0
         }
     ]
-    // ,effects:[getPostList]
 });
 
 
 const BoardList: React.FC = ()=>{
-    // const navigate = useNavigate();
     
     const page = useMemo(
     () => queryString.parse(window.location.search)["page"] as string || null,
@@ -78,37 +76,34 @@ const BoardList: React.FC = ()=>{
 
     const [postList,setPostList]= useRecoilState(postListState);
    
-    const getPostList =()=>{
-        api
-            .get(`/api/boards`)
-            .then((response) => response.data.data)
-            .then((data) => {
-                const paginatedData :Array<Post[]> = [];
-                let tempArray: Array<Post> = [];
-                let l: number = 0;
-                for(let oneRow of data){
-                    tempArray.push(oneRow);
-                    l+=1;
-                    if(l>=Number(limit)){
-                        paginatedData.push(tempArray);
-                        tempArray=[];
-                        l=0;
-                    }
-                }
-                if(tempArray.length>0){
+    const getPostList =async()=>{
+        try {
+            const response = await api.get(`/api/boards`)
+            const paginatedData :Array<Post[]> = [];
+            let tempArray: Array<Post> = [];
+            let l: number = 0;
+            for(let oneRow of response.data.data){
+                tempArray.push(oneRow);
+                l+=1;
+                if(l>=Number(limit)){
                     paginatedData.push(tempArray);
+                    tempArray=[];
+                    l=0;
                 }
-                if(paginatedData.length<Number(page)){
-                    window.location.replace(`/board?page=${paginatedData.length}&limit=${limit}`);
-                }
-                else{
-                    setPostList(paginatedData[Number(page)-1]);
-                }
-            })
-            .catch((error) => {
+            }
+            if(tempArray.length>0){
+                paginatedData.push(tempArray);
+            }
+            if(paginatedData.length<Number(page)){
+                window.location.replace(`/board?page=${paginatedData.length}&limit=${limit}`);
+            }
+            else{
+                setPostList(paginatedData[Number(page)-1]);
+            }
+        } catch (error:any){
                 alert(error.response.data.errorMessage);
                 window.location.replace("/");
-            });
+            };
     }
 
     const checkQueryString = ():void=>{
