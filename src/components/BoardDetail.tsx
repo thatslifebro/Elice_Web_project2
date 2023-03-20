@@ -35,39 +35,54 @@ const BoardDetail: React.FC = ()=>{
         e.preventDefault();
         window.location.replace(`/board/update?id=${qs.id}`);
     }
-    const clickDelete = (e:React.MouseEvent<HTMLButtonElement>)=>{
-        e.preventDefault();
-        api
-        .delete(`/api/boards/${qs.id}`)
-        .then(response=>response.status)
-        .then((data)=>{
-            if(data===200){
+
+    const clickDelete = async (e:React.MouseEvent<HTMLButtonElement>)=>{
+        try {
+            e.preventDefault();
+            const response = await api.delete(`/api/boards/${qs.id}`)
+            if(response.status===200){
                 window.location.replace('/board');
             }
             else{
                 alert("삭제할 수 없습니다.")
             }
-        })
-        .catch((error)=>{
+        } catch (error:any){
             alert(error.response.data.errorMessage);
-        })
+        }
+
+    }
+
+    const clickParticipate = async (e:React.MouseEvent<HTMLButtonElement>)=>{
+        try{
+            e.preventDefault();
+            const response = await api.post(`/api/boards/${qs.id}/participants`);
+            setPost(response.data.data);
+        } catch (error : any){
+            alert(error.response.data.errorMessage);
+        }
+    }
+
+    const clickCommentAdd = async (e:React.MouseEvent<HTMLButtonElement>)=>{
+        try{
+            e.preventDefault();
+            // const response = await api.post()
+        }
+        catch(error){
+            
+        }
     }
 
     const qs = queryString.parse(window.location.search);
 
     const [post, setPost]= useRecoilState(postState);
 
-    const getPost=()=>{
-        api
-            .get(`/api/boards/${qs.id}`)
-            .then((response) => response.data.data)
-            .then((data) => {
-                    setPost(data);
-                }
-            )
-            .catch((error) => {
-                alert(error.response.data.errorMessage);
-            });
+    const getPost=async ()=>{
+        try {
+            const response = await api.get(`/api/boards/${qs.id}`)
+            setPost(response.data.data);
+        } catch (error : any) {
+            alert(error.response.data.errorMessage);
+        }
     }
 
 
@@ -85,7 +100,7 @@ const BoardDetail: React.FC = ()=>{
             <span className="text-sm">{String(post.createdAt)}</span>
         </div>
         <div>
-            <button type="button" className="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">참가하기</button>
+            <button type="button" className="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" onClick={clickParticipate}>참가하기</button>
         </div>
     </div>
     <hr />
@@ -159,7 +174,7 @@ const BoardDetail: React.FC = ()=>{
             
             <div className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                 <textarea className="block p-2.5 m-auto w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Write your thoughts here..."></textarea>
-                <div className="text-right"><button className="rounded-full bg-sky-200 p-1 ml-3">등록</button></div>
+                <div className="text-right"><button className="rounded-full bg-sky-200 p-1 ml-3" onClick={clickCommentAdd}>등록</button></div>
             </div>
         </div>
     </div>
