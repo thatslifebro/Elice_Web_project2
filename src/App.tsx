@@ -1,7 +1,7 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
 
-import { lazy } from 'react';
+
 import Header from './components/Header';
 import Footer from './components/Footer';
 
