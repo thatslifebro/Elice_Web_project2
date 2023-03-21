@@ -1,12 +1,15 @@
 import queryString from "query-string";
 import React, { useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
-import { postState } from "../components/BoardDetail";
+import { postState } from "./BoardDetail";
 import { api } from "../utils/customAxios";
 
 const BoardUpdate: React.FC = ()=>{
     const qs = queryString.parse(window.location.search);
+
+    const navigate = useNavigate();
 
     type PostForm={
         title: string,
@@ -23,7 +26,7 @@ const BoardUpdate: React.FC = ()=>{
         try {
             const response = await api.put(`/api/boards/${qs.id}`,data)
             if(response.status===200){
-                window.location.replace("/board");
+                navigate('/board?page=1&limit=10');
             }
             else{
                  alert("권한이 없습니다.");

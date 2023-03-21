@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import BoardList from '../components/BoardList'
-import BoardDetail from "../components/BoardDetail";
+import BoardDetail from "./BoardDetail";
 import queryString from 'query-string';
 
 const Board: React.FC = ()=>{

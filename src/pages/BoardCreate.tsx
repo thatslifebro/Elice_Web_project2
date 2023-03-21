@@ -1,8 +1,11 @@
 import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { api } from "../utils/customAxios";
 
 const BoardCreate: React.FC = ()=>{
+
+    const navigate = useNavigate();
     type PostForm={
         title: string,
         content: string,
@@ -18,8 +21,8 @@ const BoardCreate: React.FC = ()=>{
     const onSubmit: SubmitHandler<PostForm> = async (data) => {
         try {
             const newData = {...data, totalCount: Number(data.totalCount)};
-            await api.post(`/api/boards`,newData)
-            window.location.replace("/board");
+            await api.post(`/api/boards`,newData);
+            navigate("/board?page=1&limit=10");
         } catch (error:any ) {
             alert(error.response.data.errorMessage);
         };

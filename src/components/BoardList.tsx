@@ -7,24 +7,10 @@ import BoardListRow from "./BoardListRow";
 
 type paginationProps = {
     num: number,
-    limit: string
+    limit: number;
 }
 
-const PaginationDefault : React.FC<paginationProps> = ({num,limit})=>{
-    return(
-        <li>
-            <a href={`/board?page=${num}&limit=${limit}`} className="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">{num}</a>
-        </li>
-    )
-}
 
-const PaginationChecked : React.FC<paginationProps> = ({num,limit})=>{
-    return(
-        <li>
-            <a href={`/board?page=${num}&limit=${limit}`} className="z-10 px-3 py-2 leading-tight text-blue-600 border border-blue-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white">{num}</a>
-        </li>
-    )
-}
 
 export interface Participants {
         totalCount: number,
@@ -63,99 +49,159 @@ export const postListState = atom<Post[]>({
     ]
 });
 
+const totalPostsCountState = atom<number>({
+    key: "totalPostsCount",
+    default:0
+});
+
+const pageNowState = atom<number>({
+    key: "pageNow",
+    default:1
+});
+
+const limitState = atom<number>({
+    key: "limit",
+    default:10
+});
+
+
 
 const BoardList: React.FC = ()=>{
     
-    const page = useMemo(
+    const qsPage = useMemo(
     () => queryString.parse(window.location.search)["page"] as string || null,
     []);
-    const limit = useMemo(
+    const qsLimit = useMemo(
     () => queryString.parse(window.location.search)["limit"] as string || null,
     []);
-    
 
     const [postList,setPostList]= useRecoilState(postListState);
-   
+    const [totalPostsCount,setTotalPostsCount]= useRecoilState(totalPostsCountState);
+    const [pageNow, setPageNow]= useRecoilState(pageNowState);
+    const [limit,setLimit] = useRecoilState(limitState);
+
+    const PaginationDefault : React.FC<paginationProps> = ({num,limit})=>{
+        return(
+            <li>
+                <div onClick={
+                    async ()=>{
+                        try {
+                            const response = await api.get(`/api/boards?page=${num}&limit=${limit}`);
+                            setPostList(response.data.data.boards);
+                            setTotalPostsCount(response.data.data.totalPage);
+                            const newPageNow = num;
+                            setPageNow(newPageNow);
+                        } catch (error:any){
+                            alert(error.response.data.errorMessage);
+                            setPostList([]);
+                        };
+                    }
+                } className="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">{num}</div>
+            </li>
+        )
+    }
+
+    const PaginationChecked : React.FC<paginationProps> = ({num,limit})=>{
+        return(
+            <li>
+                <div onClick={
+                    async ()=>{
+                        try {
+                            const response = await api.get(`/api/boards?page=${num}&limit=${limit}`);
+                            setPostList(response.data.data.boards);
+                            setTotalPostsCount(response.data.data.totalPage);
+                            const newPageNow = num;
+                            setPageNow(newPageNow);
+                        } catch (error:any){
+                            alert(error.response.data.errorMessage);
+                            setPostList([]);
+                        };
+                    }
+                } className="z-10 px-3 py-2 leading-tight text-blue-600 border border-blue-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white">{num}</div>
+            </li>
+        )
+    }
+
     const getPostList =async()=>{
         try {
-            const response = await api.get(`/api/boards`)
-            const paginatedData :Array<Post[]> = [];
-            let tempArray: Array<Post> = [];
-            let l: number = 0;
-            for(let oneRow of response.data.data){
-                tempArray.push(oneRow);
-                l+=1;
-                if(l>=Number(limit)){
-                    paginatedData.push(tempArray);
-                    tempArray=[];
-                    l=0;
-                }
+            const response = await api.get(`/api/boards?page=${qsPage}&limit=${qsLimit}`);
+            if(response.data.data.totalPage===0){
+                alert("등록된 게시물이 없습니다.");
             }
-            if(tempArray.length>0){
-                paginatedData.push(tempArray);
+            if(response.data.data.boards.length===0 && response.data.data.totalPage!==0){
+                alert("page나 limit가 잘못되었습니다.");
             }
-            if(paginatedData.length<Number(page)){
-                window.location.replace(`/board?page=${paginatedData.length}&limit=${limit}`);
-            }
-            else{
-                setPostList(paginatedData[Number(page)-1]);
-            }
+            setPostList(response.data.data.boards);
+            setTotalPostsCount(response.data.data.totalPage);
+            
         } catch (error:any){
                 alert(error.response.data.errorMessage);
-                window.location.replace("/");
+                setPostList([]);
             };
     }
 
     const checkQueryString = ():void=>{
-        if(Number(page)<1){
-            window.location.replace(`/board?page=1&limit=${limit}`);
+        if(Number(qsPage)<1){
+            setPageNow(1);
         }
-        if(Number(limit)<1){
-            window.location.replace(`/board?page=1&limit=10`);
+        if(Number(qsLimit)<1){
+            setLimit(10);
         }
+        else {
+        setPageNow(Number(qsPage));
+        setLimit(Number(qsLimit));}
     }
 
+    const clickPreviousPage = async (e:React.MouseEvent<HTMLDivElement>)=>{
+        try {
+            if(pageNow===1) return;
+            const response = await api.get(`/api/boards?page=${pageNow-1}&limit=${limit}`);
+            setPostList(response.data.data.boards);
+            setTotalPostsCount(response.data.data.totalPage);
+            const newPageNow = pageNow-1;
+            setPageNow(newPageNow);
+        } catch (error:any){
+                alert(error.response.data.errorMessage);
+                setPostList([]);
+        };
+    }
+
+    const clickNextPage = async (e:React.MouseEvent<HTMLDivElement>)=>{
+        try {
+            if(pageNow===Math.floor((totalPostsCount-1)/limit)+1) return;
+            const response = await api.get(`/api/boards?page=${pageNow+1}&limit=${limit}`);
+            setPostList(response.data.data.boards);
+            setTotalPostsCount(response.data.data.totalPage);
+            const newPageNow = pageNow+1;
+            setPageNow(newPageNow);
+            
+        } catch (error:any){
+                alert(error.response.data.errorMessage);
+                setPostList([]);
+        };
+    }
 
     useEffect(()=>{
         checkQueryString();
         getPostList();
-
+        
     },[])
 
     const Pagination : React.FC = ()=>{
-        if(page==='1'){
-            return(
-                <>
-                    <PaginationChecked num={1} limit={limit?limit:String(10)} />
-                    <PaginationDefault num={2} limit={limit?limit:String(10)} />
-                    <PaginationDefault num={3} limit={limit?limit:String(10)} />
-                    <PaginationDefault num={4} limit={limit?limit:String(10)} />
-                    <PaginationDefault num={5} limit={limit?limit:String(10)} />
-                </>
-            )
+        const pagesCount = totalPostsCount/limit +1;
+        const paginator = [];
+        
+        for(let i=1;i<pagesCount;i++){
+            if(pageNow===i){
+                paginator.push(<PaginationChecked num={i} limit={Number(qsLimit)} />)
+            } else{
+                paginator.push(<PaginationDefault num={i} limit={Number(qsLimit)} />)
+            }
         }
-        else if(page==='2'){
-            return(
-                <>
-                    <PaginationDefault num={1} limit={limit?limit:String(10)} />
-                    <PaginationChecked num={2} limit={limit?limit:String(10)} />
-                    <PaginationDefault num={3} limit={limit?limit:String(10)} />
-                    <PaginationDefault num={4} limit={limit?limit:String(10)} />
-                    <PaginationDefault num={5} limit={limit?limit:String(10)} />
-                </>
-            )
-        }
-        else {
-            return(
-                <>
-                    <PaginationDefault num={Number(page)-2} limit={limit?limit:String(10)} />
-                    <PaginationDefault num={Number(page)-1} limit={limit?limit:String(10)} />
-                    <PaginationChecked num={Number(page)} limit={limit?limit:String(10)} />
-                    <PaginationDefault num={Number(page)+1} limit={limit?limit:String(10)} />
-                    <PaginationDefault num={Number(page)+2} limit={limit?limit:String(10)} />
-                </>
-            )
-        }
+        return(<>
+                {paginator.map((a)=>a)}
+            </>
+        )
     }
 
     return (
@@ -216,17 +262,17 @@ const BoardList: React.FC = ()=>{
                 <nav aria-label="Page navigation example " className="text-center">
                       <ul className="inline-flex items-center -space-x-px " >
                                   <li>
-                      <a href={`/board?page=${Number(page)-1}&limit=${limit}`} className="block px-3 py-2 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                      <div onClick={clickPreviousPage} className="block px-3 py-2 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
                         <span className="sr-only">Previous</span>
                         <svg aria-hidden="true" className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path  d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" ></path></svg>
-                      </a>
+                      </div>
                                   </li>
                         <Pagination />
                                   <li>
-                      <a href={`/board?page=${Number(page)+1}&limit=${limit}`} className="block px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                      <div onClick={clickNextPage} className="block px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
                         <span className="sr-only">Next</span>
                         <svg aria-hidden="true" className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" ></path></svg>
-                      </a>
+                      </div>
                                   </li>
                       </ul>
                 

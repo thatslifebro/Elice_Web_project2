@@ -4,6 +4,7 @@ import { Routes, Route } from 'react-router-dom';
 
 import Header from './components/Header';
 import Footer from './components/Footer';
+import BoardDetail from './pages/BoardDetail';
 
 const Home = lazy(() => import('./pages/Home'));
 const SignIn = lazy(() => import('./pages/SignIn'));
@@ -27,6 +28,7 @@ function App() {
                     <Route path='/sign-in' element={<SignIn />} />
                     <Route path='/sign-up' element={<SignUp />} />
                     <Route path='/board' element={<Board />} />
+                    <Route path='/board/:id' element={<BoardDetail />} />
                     <Route path='/board/create' element={<BoardCreate />} />
                     <Route path='/board/update' element={<BoardUpdate />} />
                     <Route path='/msg' element={<Msg />} />

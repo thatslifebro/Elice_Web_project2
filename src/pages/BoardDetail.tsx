@@ -1,9 +1,11 @@
 import React, { useEffect } from "react";
-import queryString from 'query-string';
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { atom, useRecoilState } from "recoil";
 import { api } from "../utils/customAxios";
-import { Post } from "./BoardList";
+import { Post } from "../components/BoardList";
+import Comment, { commentArrayState, CommentData, commentPageState, newCommentState, totalCommentCountState } from "../components/Comment";
+import { getCommentRange } from "typescript";
+import { clear } from "console";
 
 export const postState = atom<Post>({
     key:"post",
@@ -24,24 +26,27 @@ export const postState = atom<Post>({
     
 });
 
-const BoardDetail: React.FC = ()=>{
 
+const BoardDetail: React.FC = ()=>{
+    const {id} = useParams();
+
+    const navigate = useNavigate();
     const clickBoardList =(e:React.MouseEvent<HTMLButtonElement>)=>{
         e.preventDefault();
-        window.location.replace('/board');
+        navigate('/board?page=1&limit=10');
     }
 
     const clickUpdate = (e:React.MouseEvent<HTMLButtonElement>)=>{
         e.preventDefault();
-        window.location.replace(`/board/update?id=${qs.id}`);
+        navigate(`/board/update?id=${id}`);
     }
 
     const clickDelete = async (e:React.MouseEvent<HTMLButtonElement>)=>{
         try {
             e.preventDefault();
-            const response = await api.delete(`/api/boards/${qs.id}`)
+            const response = await api.delete(`/api/boards/${id}`)
             if(response.status===200){
-                window.location.replace('/board');
+                navigate('/board?page=1&limit=10');
             }
             else{
                 alert("삭제할 수 없습니다.")
@@ -55,7 +60,7 @@ const BoardDetail: React.FC = ()=>{
     const clickParticipate = async (e:React.MouseEvent<HTMLButtonElement>)=>{
         try{
             e.preventDefault();
-            const response = await api.post(`/api/boards/${qs.id}/participants`);
+            const response = await api.post(`/api/boards/${id}/participants`);
             setPost(response.data.data);
         } catch (error : any){
             alert(error.response.data.errorMessage);
@@ -65,30 +70,86 @@ const BoardDetail: React.FC = ()=>{
     const clickCommentAdd = async (e:React.MouseEvent<HTMLButtonElement>)=>{
         try{
             e.preventDefault();
-            // const response = await api.post()
+            await api.post(`/api/boards/${id}/comments`,{content: newComment});
+            alert("댓글이 작성되었습니다.");
         }
-        catch(error){
-            
+        catch(error:any){
+            alert(error.response.data.errorMessage);
         }
     }
-
-    const qs = queryString.parse(window.location.search);
-
     const [post, setPost]= useRecoilState(postState);
+    const [comment, setComment] = useRecoilState(commentArrayState);
+    const [commentPage, setCommentPage] = useRecoilState(commentPageState);
+    const [totalCommentCount,setTotalCommentCount]=useRecoilState(totalCommentCountState);
+    const [newComment,setNewComment] = useRecoilState(newCommentState);
 
     const getPost=async ()=>{
         try {
-            const response = await api.get(`/api/boards/${qs.id}`)
+            const response = await api.get(`/api/boards/${id}`)
             setPost(response.data.data);
         } catch (error : any) {
             alert(error.response.data.errorMessage);
         }
     }
 
+    const getComment = async()=>{
+        try{
+            const response = await api.get(`/api/boards/${id}/comments?page=$1&limit=5`);
+            setComment(response.data.data.comments);
+            setTotalCommentCount(response.data.data.totalPage);
+            const currentCommentPage = commentPage;
+            setCommentPage(currentCommentPage+1);
+        } catch (error : any) {
+            alert(error.response.data.errorMessage);
+        }
+    }
+
+    const deleteComment = async (_id:string)=>{
+        try{
+            await api.delete(`/api/boards/${id}/comments/${_id}`)
+            const newComment = comment.filter((data)=>data._id!==_id);
+            setComment(newComment);
+            const newTotalCommentCount=totalCommentCount;
+            setTotalCommentCount(newTotalCommentCount-1);
+            const newCommentPage= Math.ceil(newComment.length/5)+1;
+            setCommentPage(newCommentPage);
+        } catch (error : any) {
+            alert(error.response.data.errorMessage);
+        }
+    }
+
+    const clickGetComment = async ()=>{
+        try {
+            
+            const response = await api.get(`/api/boards/${id}/comments?page=${commentPage}&limit=5`);
+            let newComment:CommentData[]=comment;
+            newComment = newComment.concat(response.data.data.comments);
+            if(totalCommentCount!==0&&totalCommentCount!==response.data.data.totalPage&&commentPage>Math.ceil(response.data.data.totalPage/5)){
+                
+                for(let i=totalCommentCount;i<response.data.data.totalPage;i++){
+                    const newResponse = await api.get(`/api/boards/${id}/comments?page=${i+1}&limit=1`);
+                    console.log(newResponse.data.data);
+                    newComment = newComment.concat(newResponse.data.data.comments);
+                }
+            }
+            setComment(newComment);
+            setTotalCommentCount(response.data.data.totalPage);
+            if(response.data.data.comments.length===0) {
+                return;
+            };
+
+            const newCommentPage = commentPage+1;
+            setCommentPage(newCommentPage);
+
+            
+        } catch (error : any) {
+            alert(error.response.data.errorMessage);
+        }
+    }
 
     useEffect(()=>{
-        getPost()
-        
+        getPost();
+        getComment();        
     },[])
 
     return (
@@ -147,36 +208,34 @@ const BoardDetail: React.FC = ()=>{
     </div>
 
     <div className="border-solid py-10 mx-32 my-20 bg-slate-100">
-        <div className="block max-w-6xl mx-auto my-3 p-3 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
-            <div className="text-left">
-                <p className="text-xl">회원1</p>
-                <p className="text-sm">2023.03.09 15:23</p>
-            </div>
-            <div className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                <p className="text-lg text-left">혹시 근처에서 같이 출발하실 분 있으실까요? 저는 평양에서 출발해요! Lorem ipsum dolor sit amet consectetur adipisicing elit. Neque recusandae distinctio quas eveniet, veniam iusto, quae nam illo harum amet quasi rem ipsum itaque beatae, voluptas consequuntur excepturi quos nobis!</p>
-            </div>
-        </div>
-        <div className="block max-w-6xl mx-auto my-3 p-3 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
-            <div className="text-left">
-                <p className="text-xl">회원2</p>
-                <p className="text-sm">2023.05.09 15:23</p>
-            </div>
-            <div className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                <p className="text-lg text-left">저는 함경북</p>
-            </div>
-            <div className="text-right">
-                <button className="rounded-full bg-sky-200 p-1">수정</button>
-                <button className="rounded-full bg-sky-200 p-1">삭제</button>
-            </div>
-        </div>
         
+        {comment.map((data)=>{
+                return (
+                    <Comment 
+                    deleteComment={deleteComment}
+                    key={data._id}
+                    _id={data._id}
+                    boardId={data.boardId}
+                    content={data.content}
+                    authorId={data.authorId}
+                    createdAt={data.createdAt}
+                    updatedAt={data.updatedAt}
+                    __v={data.__v}
+                    isDeleted={data.isDeleted} />
+                )
+        })}
+        <div className="text-center"><button className="rounded-full bg-sky-200 py-1 px-10 ml-3" onClick={clickGetComment}>댓글 더보기</button></div>
         <div className="block max-w-6xl mx-auto my-3 p-3 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
             
             <div className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                <textarea className="block p-2.5 m-auto w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Write your thoughts here..."></textarea>
+                <textarea className="block p-2.5 m-auto w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Write your thoughts here..." onChange={(e)=>{
+                    e.preventDefault();
+                    setNewComment(e.target.value);
+                }}></textarea>
                 <div className="text-right"><button className="rounded-full bg-sky-200 p-1 ml-3" onClick={clickCommentAdd}>등록</button></div>
             </div>
         </div>
+        
     </div>
     
 </div>
