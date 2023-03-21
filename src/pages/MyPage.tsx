@@ -1,5 +1,9 @@
 import React, { useRef } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import { api } from '../utils/customAxios';
+import Cookie from 'js-cookie';
+import axios, { AxiosError } from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 interface FormValue {
     nickname: string;
@@ -10,7 +14,9 @@ interface FormValue {
 }
 
 function MyPage() {
-    const user = JSON.parse(localStorage.getItem('user') || 'Anonymous');
+    const navigate = useNavigate();
+
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
     const { year, month, day } = user.birthDate;
     const birthDate = `${year}-${String(month).padStart(2, '0')}-${String(
         day
@@ -35,8 +41,48 @@ function MyPage() {
     const passwordRef = useRef<string | null>(null);
     passwordRef.current = watch('password');
 
-    const onSubmitHandler: SubmitHandler<FormValue> = (data) => {
+    const onSubmitHandler: SubmitHandler<FormValue> = async (data) => {
         console.log(data);
+        if (window.confirm('회원정보를 수정하시겠습니까?')) {
+            try {
+                const result = await api.put(`/api/users/${user.id}`, data);
+                if (result.statusText === 'OK') {
+                    user.nickname = data.nickname;
+                    localStorage.setItem('user', JSON.stringify(user));
+
+                    alert('정상적으로 수정되었습니다.');
+                    navigate('/');
+                }
+            } catch (error) {
+                console.error(error);
+                if (error instanceof AxiosError)
+                    alert(error.response?.data.errorMessage);
+            }
+        }
+    };
+
+    const onClickHandler = async () => {
+        if (window.confirm('회원을 탈퇴하시겠습니까?')) {
+            try {
+                const result = await api.delete(`/api/users/${user.id}`);
+
+                if (result.statusText === 'OK') {
+                    alert('정상적으로 탈퇴되었습니다.');
+
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('expireAt');
+                    localStorage.removeItem('accessToken');
+                    Cookie.remove('refreshToken');
+                    delete axios.defaults.headers.common['Authorization'];
+
+                    navigate('/');
+                }
+            } catch (error) {
+                console.error(error);
+                if (error instanceof AxiosError)
+                    alert(error.response?.data.errorMessage);
+            }
+        }
     };
 
     return (
@@ -190,6 +236,15 @@ function MyPage() {
                             className='text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
                         >
                             수정
+                        </button>
+                    </div>
+                    <div className='mt-3 flex flex-col justify-between'>
+                        <button
+                            type='button'
+                            onClick={onClickHandler}
+                            className='text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
+                        >
+                            회원탈퇴
                         </button>
                     </div>
                 </form>
