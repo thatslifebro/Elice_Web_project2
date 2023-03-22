@@ -1,12 +1,12 @@
 import React, { Suspense, lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
 
-
 import Header from './components/Header';
 import Footer from './components/Footer';
 import BoardDetail from './pages/BoardDetail';
 
 const Home = lazy(() => import('./pages/Home'));
+const Data = lazy(() => import('./pages/Data'));
 const SignIn = lazy(() => import('./pages/SignIn'));
 const SignUp = lazy(() => import('./pages/SignUp'));
 const MyPage = lazy(() => import('./pages/MyPage'));
@@ -24,6 +24,7 @@ function App() {
                 <Header />
                 <Routes>
                     <Route path='/' element={<Home />} />
+                    <Route path='/data' element={<Data />} />
                     <Route path='/my-page' element={<MyPage />} />
                     <Route path='/sign-in' element={<SignIn />} />
                     <Route path='/sign-up' element={<SignUp />} />
