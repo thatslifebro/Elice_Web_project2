@@ -2,11 +2,11 @@ import React, { useRef } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { api } from '../utils/customAxios';
 import Cookie from 'js-cookie';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 interface FormValue {
-    nickname: string;
+    nickname: string | undefined;
     password: string;
     confirmPassword: string;
     gender: string;
@@ -42,46 +42,30 @@ function MyPage() {
     passwordRef.current = watch('password');
 
     const onSubmitHandler: SubmitHandler<FormValue> = async (data) => {
-        console.log(data);
+        if (data.nickname === user.nickname) data.nickname = undefined;
         if (window.confirm('회원정보를 수정하시겠습니까?')) {
-            try {
-                const result = await api.put(`/api/users/${user.id}`, data);
-                if (result.statusText === 'OK') {
-                    user.nickname = data.nickname;
-                    localStorage.setItem('user', JSON.stringify(user));
+            await api.put(`/api/users/${user.id}`, data);
 
-                    alert('정상적으로 수정되었습니다.');
-                    navigate('/');
-                }
-            } catch (error) {
-                console.error(error);
-                if (error instanceof AxiosError)
-                    alert(error.response?.data.errorMessage);
-            }
+            user.nickname = data.nickname;
+            localStorage.setItem('user', JSON.stringify(user));
+
+            alert('정상적으로 수정되었습니다.');
+            navigate('/');
         }
     };
 
     const onClickHandler = async () => {
         if (window.confirm('회원을 탈퇴하시겠습니까?')) {
-            try {
-                const result = await api.delete(`/api/users/${user.id}`);
+            await api.delete(`/api/users/${user.id}`);
 
-                if (result.statusText === 'OK') {
-                    alert('정상적으로 탈퇴되었습니다.');
+            localStorage.removeItem('user');
+            localStorage.removeItem('expireAt');
+            localStorage.removeItem('accessToken');
+            Cookie.remove('refreshToken');
+            delete axios.defaults.headers.common['Authorization'];
 
-                    localStorage.removeItem('user');
-                    localStorage.removeItem('expireAt');
-                    localStorage.removeItem('accessToken');
-                    Cookie.remove('refreshToken');
-                    delete axios.defaults.headers.common['Authorization'];
-
-                    navigate('/');
-                }
-            } catch (error) {
-                console.error(error);
-                if (error instanceof AxiosError)
-                    alert(error.response?.data.errorMessage);
-            }
+            alert('정상적으로 탈퇴되었습니다.');
+            navigate('/');
         }
     };
 

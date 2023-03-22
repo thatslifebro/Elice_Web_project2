@@ -32,7 +32,8 @@ const refresh = async (
 };
 
 const refreshErrorHandle = (err: any) => {
-    Cookie.remove('refreshToken');
+    // Cookie.remove('refreshToken');
+    console.error(err);
 };
 
 export { refresh, refreshErrorHandle };

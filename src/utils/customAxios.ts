@@ -12,9 +12,15 @@ const api: AxiosInstance = axios.create({
 });
 
 api.interceptors.request.use(refresh, refreshErrorHandle);
-// api.interceptors.response.use(
-//     (res) => res.data,
-//     (error) => {}
-// );
+api.interceptors.response.use(
+    (res) => {
+        console.log(res);
+        return res;
+    },
+    (error) => {
+        alert(error.response?.data.errorMessage);
+        throw error;
+    }
+);
 
 export { customAxios, api };
