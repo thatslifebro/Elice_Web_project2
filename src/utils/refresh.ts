@@ -9,6 +9,10 @@ const refresh = async (
     const expireAt = localStorage.getItem('expiresAt');
     let token = localStorage.getItem('accessToken');
 
+    const isLogin = config.url?.includes('login');
+
+    if (!isLogin && !token) window.location.replace('/');
+
     // 토큰이 만료되었고, refreshToken 이 저장되어 있을 때
     if (moment(expireAt).diff(moment()) < 0 && refreshToken) {
         axios.defaults.headers.common['Authorization'] = refreshToken;
@@ -33,7 +37,7 @@ const refresh = async (
 
 const refreshErrorHandle = (err: any) => {
     // Cookie.remove('refreshToken');
-    console.error(err);
+    console.error('request error', err);
 };
 
 export { refresh, refreshErrorHandle };

@@ -14,7 +14,11 @@ const api: AxiosInstance = axios.create({
 api.interceptors.request.use(refresh, refreshErrorHandle);
 api.interceptors.response.use(
     (res) => {
-        console.log(res);
+        const token = localStorage.getItem('accessToken');
+        const isLogin = res.request.responseURL.includes('login');
+
+        if (!isLogin && !token) window.location.replace('/');
+
         return res;
     },
     (error) => {

@@ -16,6 +16,9 @@ interface FormValue {
 function MyPage() {
     const navigate = useNavigate();
 
+    const token = localStorage.getItem('accessToken');
+    if (!token) window.location.replace('/');
+
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const { year, month, day } = user.birthDate;
     const birthDate = `${year}-${String(month).padStart(2, '0')}-${String(
