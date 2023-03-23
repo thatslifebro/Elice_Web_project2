@@ -1,4 +1,5 @@
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
+import Cookie from 'js-cookie';
 import { refresh, refreshErrorHandle } from './refresh';
 
 const customAxios: AxiosInstance = axios.create({
@@ -11,14 +12,33 @@ const api: AxiosInstance = axios.create({
     params: {},
 });
 
+api.interceptors.request.use(
+    async (
+        config: InternalAxiosRequestConfig
+    ): Promise<InternalAxiosRequestConfig> => {
+        const refreshToken = Cookie.get('refreshToken');
+        let token = localStorage.getItem('accessToken');
+
+        const isLogin = config.url?.includes('login');
+
+        if (!isLogin && !token) window.location.replace('/');
+        if (!isLogin && !refreshToken) {
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('user');
+            Cookie.remove('refreshToken');
+            window.location.replace('/sign-in');
+        }
+
+        return config;
+    },
+    (error) => {
+        alert(error.response?.data.errorMessage);
+        throw error;
+    }
+);
 api.interceptors.request.use(refresh, refreshErrorHandle);
 api.interceptors.response.use(
     (res) => {
-        const token = localStorage.getItem('accessToken');
-        const isLogin = res.request.responseURL.includes('login');
-
-        if (!isLogin && !token) window.location.replace('/');
-
         return res;
     },
     (error) => {
