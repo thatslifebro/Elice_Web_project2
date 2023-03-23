@@ -1,12 +1,18 @@
 import React from 'react';
+import TypeIt from "typeit-react";
 
 function Home() {
     return (
         <>
             <img src='river.jpg' alt='' className='opacity-30' />
-            <span className='absolute top-[200px] left-16 text-6xl'>
-                한강 드라이브 갈까요?
-            </span>
+            <TypeIt
+                className='absolute top-[200px] left-16 text-6xl'
+                options={{
+                strings: ["제목을 작성해주세요"],
+                speed: 100,
+                waitUntilVisible: true,
+                }}
+            />
         </>
     );
 }
