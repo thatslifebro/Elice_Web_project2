@@ -100,14 +100,13 @@ function Msg() {
             await api.post(`/api/users/${user.id}/letters`, data);
             window.location.replace("/msg")
         } catch (error : any) {
-            alert("Invalid request");
+            alert(error);
         }
     };
 
     // 쪽지함을 보여주는 함수
     const showMsgBox = () => {
         const result = [];
-
         for (let k in Groupby) {
             const v: any = Groupby[k]
             result.push(
@@ -121,7 +120,6 @@ function Msg() {
                 </button>                
             );
         }
-
         return result;
     };
 
@@ -170,10 +168,6 @@ function Msg() {
                         />
                         <button>보내기</button>
                     </form>
-                    {/* {errors.content?.type === 'minLength' &&
-                    '최소 1자부터 입력할 수 있습니다!'}
-                    {errors.content?.type === 'maxLength' &&
-                    '최대 200자까지 입력할 수 있습니다!'} */}
                 </div>
             </div>
         </>

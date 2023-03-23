@@ -1,11 +1,17 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { atom, useRecoilState } from "recoil";
 import { api } from "../utils/customAxios";
 import { Post } from "../components/BoardList";
 import Comment, { commentArrayState, CommentData, commentPageState, newCommentState, totalCommentCountState } from "../components/Comment";
-import { getCommentRange } from "typescript";
-import { clear } from "console";
+import { useForm, SubmitHandler } from 'react-hook-form';
+// import { getCommentRange } from "typescript";
+// import { clear } from "console";
+
+interface FormValue {
+    content: string;
+    receiverId: number;
+}
 
 export const postState = atom<Post>({
     key:"post",
@@ -23,11 +29,15 @@ export const postState = atom<Post>({
             isDeleted: false,
             __v: 0
         },
-    
 });
 
-
 const BoardDetail: React.FC = ()=>{
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm<FormValue>();
+
     const {id} = useParams();
 
     const navigate = useNavigate();
@@ -83,6 +93,11 @@ const BoardDetail: React.FC = ()=>{
     const [totalCommentCount,setTotalCommentCount]=useRecoilState(totalCommentCountState);
     const [newComment,setNewComment] = useRecoilState(newCommentState);
 
+    // 쪽지 관련
+    const [Receiver, setReceiver] = useState(0);
+    const [ShowMsg, setShowMsg] = useState(0);
+    const user = JSON.parse(localStorage.getItem('user') || 'Anonymous');
+
     const getPost=async ()=>{
         try {
             const response = await api.get(`/api/boards/${id}`)
@@ -120,7 +135,6 @@ const BoardDetail: React.FC = ()=>{
 
     const clickGetComment = async ()=>{
         try {
-            
             const response = await api.get(`/api/boards/${id}/comments?page=${commentPage}&limit=5`);
             let newComment:CommentData[]=comment;
             newComment = newComment.concat(response.data.data.comments);
@@ -147,99 +161,147 @@ const BoardDetail: React.FC = ()=>{
         }
     }
 
+    const clickMsg = () => {
+        setShowMsg(1);
+    }
+
+    // 쪽지 전송버튼 핸들러
+    const onSubmitHandler: SubmitHandler<FormValue> = async (data) => {
+        try {
+            setShowMsg(0);
+            data.receiverId = Receiver;
+            // await api.post(`/api/users/${user.id}/letters`, data);
+            window.location.replace("/msg")
+        } catch (error : any) {
+            alert(error);
+        }
+    };
+
     useEffect(()=>{
         getPost();
         getComment();        
     },[])
 
     return (
-<div className="mx-40 my-32">
-    <div className="grid grid-cols-4 gap-4">
-        <div className="col-span-3">
-            <p className="text-2xl">{post.title}</p>
-            <span className="text-sm mr-5">{post.authorId}</span>
-            <span className="text-sm">{String(post.createdAt)}</span>
-        </div>
-        <div>
-            <button type="button" className="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" onClick={clickParticipate}>참가하기</button>
-        </div>
-    </div>
-    <hr />
-    <div className="grid grid-cols-4 gap-4 mt-5">
-        <div className="col-span-3">
-            <p className="text-xl m-10"> {post.content}</p>
-        </div>
-        <div>
-            <table>
-                <thead className="text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                    <tr>
-                        <th scope="col" className="px-6 py-3">
-                            참가자 ( {post.participantInfo.currentCount} / {post.participantInfo.totalCount})
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {post.participantInfo.userIdList.map((id)=>{
-                        return(
-                            <tr key={id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                        <td className="px-6 py-4">
-                            {id}
-                        </td>
-                    </tr>
-                        )
-                    })}
-                    
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <div className="grid grid-cols-4 gap-4 mt-5">
-        <ul className="inline-flex items-center ">
-            <li>
-                <button type="button" className="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" onClick={clickBoardList}>목록</button>
-            </li>
-            <li>
-                <Link to="/board/update"><button type="button" className="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" onClick={clickUpdate}>수정</button></Link>
-            </li>
-            <li>
-                <button type="button" className="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" onClick={clickDelete}>삭제</button>
-            </li>
-        </ul>
-    </div>
+        <>
+        {/* 쪽지 보내는 박스 */}
+        {ShowMsg == 1 &&
+            <div className="absolute flex justify-center items-center min-h-screen min-w-full bg-slate-50/75">
+                <form onSubmit={handleSubmit(onSubmitHandler)} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+                    <div className="mb-4">
+                        <label className="block text-gray-700 text-sm font-bold mb-2">
+                            쪽지
+                        </label>
+                        <input
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            {...register('content', {
+                                required: true,
+                                minLength: 1,
+                                maxLength: 200,
+                            })}                        
+                            type="text"
+                            placeholder="Write youe message here"
+                        />
+                    </div>
+                    <div className="flex items-center justify-between">
+                        <button
+                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        >
+                            전송
+                        </button>
+                    </div>
+                </form>
+            </div>
+        }
 
-    <div className="border-solid py-10 mx-32 my-20 bg-slate-100">
-        
-        {comment.map((data)=>{
-                return (
-                    <Comment 
-                    deleteComment={deleteComment}
-                    key={data._id}
-                    _id={data._id}
-                    boardId={data.boardId}
-                    content={data.content}
-                    authorId={data.authorId}
-                    createdAt={data.createdAt}
-                    updatedAt={data.updatedAt}
-                    __v={data.__v}
-                    isDeleted={data.isDeleted} />
-                )
-        })}
-        <div className="text-center"><button className="rounded-full bg-sky-200 py-1 px-10 ml-3" onClick={clickGetComment}>댓글 더보기</button></div>
-        <div className="block max-w-6xl mx-auto my-3 p-3 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
-            
-            <div className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                <textarea className="block p-2.5 m-auto w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Write your thoughts here..." onChange={(e)=>{
-                    e.preventDefault();
-                    setNewComment(e.target.value);
-                }}></textarea>
-                <div className="text-right"><button className="rounded-full bg-sky-200 p-1 ml-3" onClick={clickCommentAdd}>등록</button></div>
+        <div className="mx-40 my-32">
+            <div className="grid grid-cols-4 gap-4">
+                <div className="col-span-3">
+                    <p className="text-2xl">{post.title}</p>
+                    <span className="text-sm mr-5">{post.authorId}</span>
+                    <span className="text-sm">{String(post.createdAt)}</span>
+                </div>
+                <div>
+                    <button type="button" className="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" onClick={clickParticipate}>참가하기</button>
+                </div>
+            </div>
+            <hr />
+            <div className="grid grid-cols-4 gap-4 mt-5">
+                <div className="col-span-3">
+                    <p className="text-xl m-10">{post.content}</p>
+                </div>
+                <div>
+                    <table>
+                        <thead className="text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                            <tr>
+                                <th scope="col" className="px-6 py-3">
+                                    참가자 ( {post.participantInfo.currentCount} / {post.participantInfo.totalCount})
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {post.participantInfo.userIdList.map((id)=>{
+                                return(
+                                    <tr key={id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                <td className="px-6 py-4">
+                                    {id}
+                                </td>
+                            </tr>
+                                )
+                            })}
+                            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div className="grid grid-cols-4 gap-4 mt-5">
+                <ul className="inline-flex items-center ">
+                    <li>
+                        <button type="button" className="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" onClick={clickBoardList}>목록</button>
+                    </li>
+                    <li>
+                        <Link to="/board/update"><button type="button" className="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" onClick={clickUpdate}>수정</button></Link>
+                    </li>
+                    <li>
+                        <button type="button" className="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" onClick={clickDelete}>삭제</button>
+                    </li>
+                    <li>
+                        <button type="button" className="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" onClick={clickMsg}>쪽지</button>
+                    </li>
+                </ul>
+            </div>
+
+            <div className="border-solid py-10 mx-32 my-20 bg-slate-100">
+                
+                {comment.map((data)=>{
+                        return (
+                            <Comment 
+                            deleteComment={deleteComment}
+                            key={data._id}
+                            _id={data._id}
+                            boardId={data.boardId}
+                            content={data.content}
+                            authorId={data.authorId}
+                            createdAt={data.createdAt}
+                            updatedAt={data.updatedAt}
+                            __v={data.__v}
+                            isDeleted={data.isDeleted} />
+                        )
+                })}
+                <div className="text-center"><button className="rounded-full bg-sky-200 py-1 px-10 ml-3" onClick={clickGetComment}>댓글 더보기</button></div>
+                <div className="block max-w-6xl mx-auto my-3 p-3 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+                    
+                    <div className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                        <textarea className="block p-2.5 m-auto w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Write your thoughts here..." onChange={(e)=>{
+                            e.preventDefault();
+                            setNewComment(e.target.value);
+                        }}></textarea>
+                        <div className="text-right"><button className="rounded-full bg-sky-200 p-1 ml-3" onClick={clickCommentAdd}>등록</button></div>
+                    </div>
+                </div>
             </div>
         </div>
-        
-    </div>
-    
-</div>
-
+        </>
     )
 }
 
