@@ -160,6 +160,9 @@ const BoardDetail: React.FC = ()=>{
                 return ;
             }
             const response = await api.get(`/api/boards/${id}/comments?page=${commentPage}&limit=5`);
+            if(response.data.data.comments.length===0){
+                return;
+            }
             let newComment:CommentData[]=comment;
             newComment = newComment.concat(response.data.data.comments.reverse());
             setComment(newComment);
