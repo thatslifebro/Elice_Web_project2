@@ -20,21 +20,15 @@ function SignIn() {
     const navigate = useNavigate();
 
     const onSubmitHandler: SubmitHandler<FormValue> = async (data) => {
-        try {
-            const token = await api.post('/api/users/login', data);
-            if (token.status === 200) {
-                const { accessToken, refreshToken } = token.data.data;
+        const token = await api.post('/api/users/login', data);
+        if (token.status === 200) {
+            const { accessToken, refreshToken } = token.data.data;
 
-                setAuthorizationToken(accessToken, refreshToken);
-                navigate('/');
+            setAuthorizationToken(accessToken, refreshToken);
+            navigate('/');
 
-                const user = await api.post('/api/users/user');
-                localStorage.setItem('user', JSON.stringify(user.data.data));
-            }
-        } catch (error) {
-            console.error(error);
-            if (error instanceof AxiosError)
-                alert(error.response?.data.errorMessage);
+            const user = await api.post('/api/users/user');
+            localStorage.setItem('user', JSON.stringify(user.data.data));
         }
     };
 
@@ -44,7 +38,7 @@ function SignIn() {
                 <img
                     src='logo.png'
                     className='w-[50%] mx-auto'
-                    alt='Flowbite Logo'
+                    alt='Logo'
                 />
                 <form onSubmit={handleSubmit(onSubmitHandler)}>
                     <div className='mb-6'>

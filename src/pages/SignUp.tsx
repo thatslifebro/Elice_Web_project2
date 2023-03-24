@@ -51,11 +51,7 @@ function SignUp() {
     return (
         <>
             <div className='px-14 py-10 w-4/12 mx-auto mt-[10rem] mb-16 border-solid border border-gray-800/10 rounded-3xl shadow-2xl'>
-                <img
-                    src='logo.png'
-                    className='w-[50%] mx-auto'
-                    alt='Flowbite Logo'
-                />
+                <img src='logo.png' className='w-[50%] mx-auto' alt='Logo' />
                 <form onSubmit={handleSubmit(onSubmitHandler)}>
                     <div className='mb-6'>
                         <label

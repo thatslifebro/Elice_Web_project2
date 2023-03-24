@@ -31,7 +31,7 @@ function Header() {
                         <img
                             src='logo.png'
                             className='h-12'
-                            alt='Flowbite Logo'
+                            alt='Logo'
                         />
                         <span className='self-center text-xl font-semibold whitespace-nowrap dark:text-white'>
                             오손도손
