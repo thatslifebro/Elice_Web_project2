@@ -26,7 +26,7 @@ pipeline {
             steps {
                 deleteDir() // 이전에 가져온 소스 코드를 모두 삭제
                 checkout scm
-                sh 'git checkout develop && git pull origin develop'
+                sh 'git checkout develop'
             }
         }
 
