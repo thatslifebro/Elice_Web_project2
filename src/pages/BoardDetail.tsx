@@ -94,14 +94,15 @@ const BoardDetail: React.FC = ()=>{
     const [newComment,setNewComment] = useRecoilState(newCommentState);
 
     // 쪽지 관련
-    const [Receiver, setReceiver] = useState(0);
+    const [Receiver, setReceiver] = useState("");
     const [ShowMsg, setShowMsg] = useState(0);
-    const user = JSON.parse(localStorage.getItem('user') || 'Anonymous');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
 
     const getPost=async ()=>{
         try {
             const response = await api.get(`/api/boards/${id}`)
             setPost(response.data.data);
+            setReceiver(response.data.data.userId);
         } catch (error : any) {
             alert(error.response.data.errorMessage);
         }
@@ -161,6 +162,7 @@ const BoardDetail: React.FC = ()=>{
         }
     }
 
+    // 쪽지 버튼을 눌렀을때 쪽지 입력창을 보여줌
     const clickMsg = () => {
         setShowMsg(1);
     }
@@ -169,9 +171,9 @@ const BoardDetail: React.FC = ()=>{
     const onSubmitHandler: SubmitHandler<FormValue> = async (data) => {
         try {
             setShowMsg(0);
-            data.receiverId = Receiver;
-            // await api.post(`/api/users/${user.id}/letters`, data);
-            window.location.replace("/msg")
+            data.receiverId = parseInt(Receiver);
+            await api.post(`/api/users/${user.id}/letters`, data);
+            alert("쪽지가 성공적으로 보내졌습니다.")
         } catch (error : any) {
             alert(error);
         }
@@ -214,7 +216,7 @@ const BoardDetail: React.FC = ()=>{
             </div>
         }
 
-        <div className="mx-40 my-32">
+        <div className="mx-40 py-8">
             <div className="grid grid-cols-4 gap-4">
                 <div className="col-span-3">
                     <p className="text-2xl">{post.title}</p>
