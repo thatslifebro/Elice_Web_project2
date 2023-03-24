@@ -42,6 +42,17 @@ export default function Data() {
 
     return (
         <>
+            <div className='h-[100%] mt-16 pt-16'>
+                <p className='text-center mx-auto my-1 text-lg'>
+                    <b>체육시설 접근성 낮음</b> 값과 <b>동반 참여자 부재 </b>
+                    값이 최근 2020년 들어 값이 크게 증가한 것을 확인할 수 있다.
+                    <br />
+                    참여 이유와 꾸준히 참여하지않는 이유를 보면
+                    <b> 즐거움과 사교</b>를 위해 체육활동에 참여하지만
+                    <b> 접근성과 같이할 동반자</b>가 없어서 참여가 꾸준하지 못한
+                    것을 알 수 있다.
+                </p>
+            </div>
             <div className='h-[600px] mt-16 mx-[15%] py-16'>
                 <h2 className='text-center h-[10%] my-1 text-xl font-semibold'>
                     1인가구 데이터(서울)
@@ -212,6 +223,13 @@ export default function Data() {
                         />
                     </LineChart>
                 </ResponsiveContainer>
+            </div>
+            <div className='h-[100%] my-16 py-16'>
+                <p className='text-center mx-auto my-1 text-xl'>
+                    이러한 데이터를 통해 우리는
+                    <b> 서울시에서 같이 체육활동을 할 사람을 찾아주는 서비스</b>
+                    를 제공할 것이다.
+                </p>
             </div>
         </>
     );
