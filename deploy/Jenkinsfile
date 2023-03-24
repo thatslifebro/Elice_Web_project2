@@ -1,0 +1,32 @@
+pipeline {
+    agent any
+
+    environment {
+        /* Jenkins credentials */
+        VM_ENTER_CREDENTIAL_ID = 'enter-vm-credential' // elice VM에 접속하기 위한 credential
+        OSONDOSON_VM_CREDENTIAL_ID = 'osondoson-vm-credential' // VM 자체에 대한 credential (사용자 이름, 패스워드)
+
+        /* VM Info */
+        TARGET_HOST = '34.64.144.19'
+    }
+
+    stages {
+        stage('Deploy to VM') {
+            steps {
+                script {
+                    sshagent(credentials: ["${VM_ENTER_CREDENTIAL_ID}"]) {
+                        withCredentials([usernamePassword(credentialsId: "${OSONDOSON_VM_CREDENTIAL_ID}", passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+                            sh """
+                                ssh -o StrictHostKeyChecking=no ${USERNAME}@${TARGET_HOST} '
+                                    cd frontend
+                                    git checkout develop && git pull origin develop
+                                    npm run build
+                                '
+                            """
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
