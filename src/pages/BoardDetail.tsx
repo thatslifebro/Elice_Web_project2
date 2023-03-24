@@ -125,7 +125,7 @@ const BoardDetail: React.FC = ()=>{
         try{
             const response = await api.get(`/api/boards/${id}/comments?page=1&limit=5`);
             if(response.data.data.comments.length===0){
-                // setComment([]);
+                setComment([]);
                 return;
             }
             setTotalCommentCount(response.data.data.totalPage);
