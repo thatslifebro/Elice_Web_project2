@@ -8,7 +8,7 @@ function Home() {
             <TypeIt
                 className='absolute top-[15%] left-[5%] text-6xl'
                 options={{
-                    strings: ['TIME TO NEW WAVE'],
+                    strings: ['우리... 같이 운동할까요?'],
                     speed: 100,
                     waitUntilVisible: true,
                 }}
