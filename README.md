@@ -1,9 +1,30 @@
-# Getting Started with Create React App
+# 오손도손 웹 프로젝트
+>엘리스 AI 트랙 데이터 분석 프로젝트 5조 오손도손<br>
+개발기간: 2023.03.06 ~ 2023.03.24
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## 제목
+FitBuddy(임시)
 
-## Available Scripts
+## 개요
+"Fit(건강한) + Buddy(친구)"의 합성어로, 함께 운동을 할 동반자를 찾는다는 컨셉으로 만든 웹 사이트
 
+## 정보
+엘리스 AI 트랙에서 진행한 "3주 데이터 분석 프로젝트 만들기" 과정의 프론트엔드
+
+## 배포주소
+- 웹사이트:
+- 백엔드:
+- 프론트엔드:
+
+## 프론트엔드 팀 소개
+- 김성연: 게시판 담당
+- 조현우: 유저 관리 담당
+- 유지원: 쪽지 담당
+
+## 소개
+>"FitBuddy"는 운동 동반자를 찾는 사람들을 위한 온라인 플랫폼입니다. 사용자들이 선호하는 운동 종목을 설정하여 자신과 잘 맞는 운동 파트너를 찾을 수 있도록 돕습니다. 또한, 쪽지와 댓글 기능을 통해 통해 사용자들은 서로의 운동 기록을 공유하고, 운동에 대한 조언과 응원을 받을 수 있습니다. FitBuddy는 운동을 즐기는 사람들이 서로 도움을 주고받으며 건강한 라이프스타일을 유지할 수 있는 공간을 제공합니다.
+
+## 시작가이드
 In the project directory, you can run:
 
 ### `npm start`
@@ -14,11 +35,6 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 The page will reload if you make edits.\
 You will also see any lint errors in the console.
 
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
 ### `npm run build`
 
 Builds the app for production to the `build` folder.\
@@ -27,20 +43,26 @@ It correctly bundles React in production mode and optimizes the build for the be
 The build is minified and the filenames include the hashes.\
 Your app is ready to be deployed!
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Stacks
+### Environment
+<img src="https://img.shields.io/badge/visual_studio_code-007ACC?style=for-the-badge&logo=visualstudiocode&logoColor=white">
+<img src="https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white">
+<img src="https://img.shields.io/badge/gitlab-FC6D26?style=for-the-badge&logo=gitlab&logoColor=white">
 
-### `npm run eject`
+### Config
+<img src="https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=white">
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+### Development
+<img src="https://img.shields.io/badge/react-61DAFB?style=for-the-badge&logo=react&logoColor=white">
+<img src="https://img.shields.io/badge/typescript-3178C6?style=for-the-badge&logo=typescript&logoColor=white">
+<img src="https://img.shields.io/badge/tailwind_css-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white">
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Design
+<img src="https://img.shields.io/badge/figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white">
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+### Data Visualization
+<img src="https://img.shields.io/badge/recharts-528DD7?style=for-the-badge&logo=recharts&logoColor=white">
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Communication
+<img src="https://img.shields.io/badge/discord-5865F2?style=for-the-badge&logo=discord&logoColor=white">
+<img src="https://img.shields.io/badge/notion-000000?style=for-the-badge&logo=notion&logoColor=white">
