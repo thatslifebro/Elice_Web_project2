@@ -26,7 +26,7 @@ function Msg() {
     const [Msg, setMsg] = useState([]);
     const [Groupby, setGroupby] = useState([]);
     const [Receiver, setReceiver] = useState(0);
-    const user = JSON.parse(localStorage.getItem('user') || 'Anonymous');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
 
     const getMsg = async ()=>{
         try {
