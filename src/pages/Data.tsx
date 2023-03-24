@@ -115,7 +115,7 @@ export default function Data() {
                             strokeWidth={2}
                             type='monotone'
                             dataKey='스트레스 해소'
-                            stroke='#8884d8'
+                            stroke='#cad884'
                         />
                         <Line
                             strokeWidth={2}

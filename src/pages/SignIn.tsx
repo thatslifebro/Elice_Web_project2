@@ -42,8 +42,8 @@ function SignIn() {
         <>
             <div className='px-14 py-10 w-4/12 mx-auto mt-[10rem] mb-16 border-solid border border-gray-800/10 rounded-3xl shadow-2xl'>
                 <img
-                    src='https://flowbite.com/docs/images/logo.svg'
-                    className='w-16 h-16 mx-auto mb-8'
+                    src='logo.png'
+                    className='w-[50%] mx-auto'
                     alt='Flowbite Logo'
                 />
                 <form onSubmit={handleSubmit(onSubmitHandler)}>

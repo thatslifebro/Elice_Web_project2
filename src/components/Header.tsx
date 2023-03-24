@@ -29,8 +29,8 @@ function Header() {
                 <div className='container flex flex-wrap items-center justify-between mx-auto'>
                     <Link to='/' className='flex items-center'>
                         <img
-                            src='https://flowbite.com/docs/images/logo.svg'
-                            className='h-6 mr-3 sm:h-9'
+                            src='logo.png'
+                            className='h-12'
                             alt='Flowbite Logo'
                         />
                         <span className='self-center text-xl font-semibold whitespace-nowrap dark:text-white'>
@@ -116,14 +116,6 @@ function Header() {
                                     className='block py-2 pl-3 pr-4 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-white dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700'
                                 >
                                     데이터
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
-                                    to='#'
-                                    className='block py-2 pl-3 pr-4 text-gray-700 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 md:dark:hover:text-white dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700'
-                                >
-                                    메뉴
                                 </Link>
                             </li>
                         </ul>
