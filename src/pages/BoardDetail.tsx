@@ -88,8 +88,9 @@ const BoardDetail: React.FC = ()=>{
             const temp:CommentData[]=[...comment];
 
             temp.unshift(response2.data.data.comments[0]);
-
-            setComment(temp);
+            if(temp.length!==0){
+                setComment(temp);
+            }
 
             alert("댓글이 작성되었습니다.");
             
@@ -124,7 +125,7 @@ const BoardDetail: React.FC = ()=>{
         try{
             const response = await api.get(`/api/boards/${id}/comments?page=1&limit=5`);
             if(response.data.data.comments.length===0){
-                setComment([]);
+                // setComment([]);
                 return;
             }
             setTotalCommentCount(response.data.data.totalPage);
@@ -304,7 +305,7 @@ const BoardDetail: React.FC = ()=>{
                         <div className="text-right"><button className="rounded-full bg-sky-200 p-1 ml-3" onClick={clickCommentAdd}>등록</button></div>
                     </div>
                 </div>
-                {comment.map((data)=>{
+                {comment&&comment.map((data)=>{
                         return (
                             <Comment 
                             deleteComment={deleteComment}
