@@ -52,7 +52,7 @@ function Msg() {
             
             // 대화중인 상대방을 알기 위해 nickname 키 값 추가
             for (let element of res) {
-                if(Object.keys(element).includes('authorName')) {
+                if (Object.keys(element).includes('authorName')) {
                     element.nickname = element.authorName;
                 } else {
                     element.nickname = element.receiverName;
