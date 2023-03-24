@@ -110,7 +110,7 @@ function Msg() {
         for (let k in Groupby) {
             const v: any = Groupby[k]
             result.push(
-                <button onClick={() => {
+                <button key={v.id} onClick={() => {
                 getMsg();
                 setMsg(v);
                 setReceiver(v[0].authorId !== user.id ? v[0].authorId : v[0].receiverId);
@@ -137,10 +137,10 @@ function Msg() {
                             Msg.map((msg: {content: string, id: number, authorId: number, receiverId: number, createdAt: string})=>{
                                 // 쪽지 생성시간 한국 시간대로 변경
                                 const date = new Date(msg.createdAt);
-                                const date_kor = date.toString();
+                                const date_kor = date.toString().substring(0, 24);
 
                                 return(
-                                    <div className='m-3'>
+                                    <div key={msg.id} className='m-3'>
                                         <div className='flex place-content-between'>
                                             {msg.receiverId === user.id ?
                                                 <div className='text-xs font-semibold text-yellow-500'>받은 쪽지 | {date_kor}</div> :

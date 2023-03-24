@@ -94,7 +94,7 @@ const BoardDetail: React.FC = ()=>{
     const [newComment,setNewComment] = useRecoilState(newCommentState);
 
     // 쪽지 관련
-    const [Receiver, setReceiver] = useState(0);
+    const [Receiver, setReceiver] = useState("");
     const [ShowMsg, setShowMsg] = useState(0);
     const user = JSON.parse(localStorage.getItem('user') || '{}');
 
@@ -102,8 +102,7 @@ const BoardDetail: React.FC = ()=>{
         try {
             const response = await api.get(`/api/boards/${id}`)
             setPost(response.data.data);
-            setReceiver(response.data.data.authorId);
-            console.log(response.data.data.authorId)
+            setReceiver(response.data.data.userId);
         } catch (error : any) {
             alert(error.response.data.errorMessage);
         }
@@ -172,9 +171,9 @@ const BoardDetail: React.FC = ()=>{
     const onSubmitHandler: SubmitHandler<FormValue> = async (data) => {
         try {
             setShowMsg(0);
-            data.receiverId = Receiver;
-            // await api.post(`/api/users/${user.id}/letters`, data);
-            window.location.replace("/msg")
+            data.receiverId = parseInt(Receiver);
+            await api.post(`/api/users/${user.id}/letters`, data);
+            alert("쪽지가 성공적으로 보내졌습니다.")
         } catch (error : any) {
             alert(error);
         }
