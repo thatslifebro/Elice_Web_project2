@@ -193,9 +193,9 @@ const BoardList: React.FC = ()=>{
         
         for(let i=1;i<pagesCount;i++){
             if(pageNow===i){
-                paginator.push(<PaginationChecked num={i} limit={Number(qsLimit)} />)
+                paginator.push(<PaginationChecked key={i} num={i} limit={Number(qsLimit)} />)
             } else{
-                paginator.push(<PaginationDefault num={i} limit={Number(qsLimit)} />)
+                paginator.push(<PaginationDefault key={i} num={i} limit={Number(qsLimit)} />)
             }
         }
         return(<>

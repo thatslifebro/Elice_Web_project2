@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { atom, useRecoilState } from "recoil";
 import { api } from "../utils/customAxios";
 import { Post } from "../components/BoardList";
-import Comment, { commentArrayState, CommentData, commentPageState, newCommentState, totalCommentCountState } from "../components/Comment";
+import Comment, { commentArrayState, CommentData, commentPageState, endOfCommentState, newCommentState, totalCommentCountState } from "../components/Comment";
 import { useForm, SubmitHandler } from 'react-hook-form';
 // import { getCommentRange } from "typescript";
 // import { clear } from "console";
@@ -81,7 +81,18 @@ const BoardDetail: React.FC = ()=>{
         try{
             e.preventDefault();
             await api.post(`/api/boards/${id}/comments`,{content: newComment});
+            const tempCount = totalCommentCount+1;
+            setTotalCommentCount(tempCount);
+            
+            const response2 = await api.get(`/api/boards/${id}/comments?page=${totalCommentCount+1}&limit=1`);
+            const temp:CommentData[]=[...comment];
+
+            temp.unshift(response2.data.data.comments[0]);
+
+            setComment(temp);
+
             alert("댓글이 작성되었습니다.");
+            
         }
         catch(error:any){
             alert(error.response.data.errorMessage);
@@ -92,6 +103,7 @@ const BoardDetail: React.FC = ()=>{
     const [commentPage, setCommentPage] = useRecoilState(commentPageState);
     const [totalCommentCount,setTotalCommentCount]=useRecoilState(totalCommentCountState);
     const [newComment,setNewComment] = useRecoilState(newCommentState);
+    const [endOfComment, setEndOfComment] = useRecoilState(endOfCommentState);
 
     // 쪽지 관련
     const [Receiver, setReceiver] = useState("");
@@ -110,11 +122,20 @@ const BoardDetail: React.FC = ()=>{
 
     const getComment = async()=>{
         try{
-            const response = await api.get(`/api/boards/${id}/comments?page=$1&limit=5`);
-            setComment(response.data.data.comments);
+            const response = await api.get(`/api/boards/${id}/comments?page=1&limit=5`);
+            if(response.data.data.comments.length===0){
+                setComment([]);
+                return;
+            }
             setTotalCommentCount(response.data.data.totalPage);
-            const currentCommentPage = commentPage;
-            setCommentPage(currentCommentPage+1);
+            const pages = Math.ceil(response.data.data.totalPage/5);
+            if(pages!==1){
+                setEndOfComment(false);
+            }
+            const response2 = await api.get(`/api/boards/${id}/comments?page=${pages}&limit=5`)
+            const commentsData = response2.data.data.comments;
+            setComment(commentsData.reverse());
+            setCommentPage(pages-1);
         } catch (error : any) {
             alert(error.response.data.errorMessage);
         }
@@ -122,13 +143,12 @@ const BoardDetail: React.FC = ()=>{
 
     const deleteComment = async (_id:string)=>{
         try{
-            await api.delete(`/api/boards/${id}/comments/${_id}`)
+            await api.delete(`/api/boards/${id}/comments/${_id}`);
             const newComment = comment.filter((data)=>data._id!==_id);
             setComment(newComment);
             const newTotalCommentCount=totalCommentCount;
             setTotalCommentCount(newTotalCommentCount-1);
-            const newCommentPage= Math.ceil(newComment.length/5)+1;
-            setCommentPage(newCommentPage);
+
         } catch (error : any) {
             alert(error.response.data.errorMessage);
         }
@@ -136,25 +156,22 @@ const BoardDetail: React.FC = ()=>{
 
     const clickGetComment = async ()=>{
         try {
+            if(commentPage===0){
+                return ;
+            }
             const response = await api.get(`/api/boards/${id}/comments?page=${commentPage}&limit=5`);
             let newComment:CommentData[]=comment;
-            newComment = newComment.concat(response.data.data.comments);
-            if(totalCommentCount!==0&&totalCommentCount!==response.data.data.totalPage&&commentPage>Math.ceil(response.data.data.totalPage/5)){
-                
-                for(let i=totalCommentCount;i<response.data.data.totalPage;i++){
-                    const newResponse = await api.get(`/api/boards/${id}/comments?page=${i+1}&limit=1`);
-                    console.log(newResponse.data.data);
-                    newComment = newComment.concat(newResponse.data.data.comments);
-                }
-            }
+            newComment = newComment.concat(response.data.data.comments.reverse());
             setComment(newComment);
             setTotalCommentCount(response.data.data.totalPage);
-            if(response.data.data.comments.length===0) {
-                return;
-            };
+            
 
-            const newCommentPage = commentPage+1;
+            const newCommentPage = commentPage-1;
             setCommentPage(newCommentPage);
+            if(newCommentPage===0){
+                setEndOfComment(true);
+            }
+            
 
             
         } catch (error : any) {
@@ -274,7 +291,16 @@ const BoardDetail: React.FC = ()=>{
             </div>
 
             <div className="border-solid py-10 mx-32 my-20 bg-slate-100">
-                
+                <div className="block max-w-6xl mx-auto my-3 p-3 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+                    
+                    <div className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                        <textarea className="block p-2.5 m-auto w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Write your thoughts here..." onChange={(e)=>{
+                            e.preventDefault();
+                            setNewComment(e.target.value);
+                        }}></textarea>
+                        <div className="text-right"><button className="rounded-full bg-sky-200 p-1 ml-3" onClick={clickCommentAdd}>등록</button></div>
+                    </div>
+                </div>
                 {comment.map((data)=>{
                         return (
                             <Comment 
@@ -290,17 +316,8 @@ const BoardDetail: React.FC = ()=>{
                             isDeleted={data.isDeleted} />
                         )
                 })}
-                <div className="text-center"><button className="rounded-full bg-sky-200 py-1 px-10 ml-3" onClick={clickGetComment}>댓글 더보기</button></div>
-                <div className="block max-w-6xl mx-auto my-3 p-3 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
-                    
-                    <div className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                        <textarea className="block p-2.5 m-auto w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Write your thoughts here..." onChange={(e)=>{
-                            e.preventDefault();
-                            setNewComment(e.target.value);
-                        }}></textarea>
-                        <div className="text-right"><button className="rounded-full bg-sky-200 p-1 ml-3" onClick={clickCommentAdd}>등록</button></div>
-                    </div>
-                </div>
+                {(endOfComment)?(<></>):(<div className="text-center"><button className="rounded-full bg-sky-200 py-1 px-10 ml-3" onClick={clickGetComment}>댓글 더보기</button></div>)}
+                
             </div>
         </div>
         </>
