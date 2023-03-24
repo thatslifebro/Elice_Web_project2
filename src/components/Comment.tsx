@@ -45,6 +45,11 @@ const updateValueState = atom<string>({
     default:""
 });
 
+export const endOfCommentState = atom<boolean>({
+    key:"endOfComment",
+    default:true
+})
+
 
 interface newCommentInterface{
     _id: string, 
